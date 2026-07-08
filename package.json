@@ -2,8 +2,5 @@
   "name": "marketfy",
   "version": "1.0.0",
   "private": true,
-  "description": "Marketfy — Brand Intelligence",
-  "scripts": {
-    "build": "echo \"no build step\""
-  }
+  "description": "Marketfy — Brand Intelligence"
 }
