@@ -741,7 +741,7 @@ async function start(){
   document.getElementById('scanInfo').classList.remove('on');
   try{
     setProgress('Scanning pages, extracting design tokens...');
-    const sr=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'scrape',url})});
+    const sr=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'scrape',url})});
     const sj=await sr.json();
     if(!sr.ok||sj.error)throw new Error(sj.error||'Could not scan that site.');
     if(!sj.scraped)throw new Error('Scrape failed');
@@ -751,7 +751,7 @@ async function start(){
     si.classList.add('on');
     setProgress('Generating brand guide...');
     const optsSuffix=buildSuffix(getGlobalOpts());
-    const gr=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',section:'full',siteData,url,optsSuffix})});
+    const gr=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',section:'full',siteData,url,optsSuffix})});
     const gj=await gr.json();
     if(!gr.ok||gj.error)throw new Error(gj.error||'Brand generation failed.');
     brand=gj.result;
@@ -767,7 +767,7 @@ async function regenSec(section,soId,btn){
   btn.classList.add('spinning');btn.disabled=true;
   try{
     const optsSuffix=buildSuffix(getGlobalOpts(),getSO(section));
-    const res=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',section,siteData,url:document.getElementById('urlInput').value,currentBrand:brand,optsSuffix})});
+    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',section,siteData,url:document.getElementById('urlInput').value,currentBrand:brand,optsSuffix})});
     const json=await res.json();
     if(!res.ok||json.error)throw new Error(json.error||'Regeneration failed.');
     Object.assign(brand,json.result);
