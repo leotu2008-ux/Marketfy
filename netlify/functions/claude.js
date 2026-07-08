@@ -171,6 +171,14 @@ exports.handler = async function (event) {
 
     // ── GENERATE / REGENERATE SECTION ─────────────────────────────────────────
     if (body.action === "generate") {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: "Server is missing ANTHROPIC_API_KEY. Set it in your Netlify site's environment variables and redeploy." }),
+        };
+      }
+
       const { siteData, section, url, currentBrand, optsSuffix = "" } = body;
 
       let prompt = "";
@@ -266,8 +274,52 @@ Respond ONLY with valid JSON, no markdown, no backticks:
         }),
       });
 
-      const data = await response.json();
-      return { statusCode: response.status, headers, body: JSON.stringify(data) };
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ error: `Claude API returned a non-JSON response (HTTP ${response.status}).` }),
+        };
+      }
+
+      if (!response.ok || data.type === "error") {
+        const msg = data?.error?.message || `Claude API request failed (HTTP ${response.status}).`;
+        return { statusCode: response.status || 502, headers, body: JSON.stringify({ error: msg }) };
+      }
+
+      const text = (data.content || []).map((b) => b.text || "").join("");
+      if (!text) {
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ error: "Claude returned an empty response. Please try again." }),
+        };
+      }
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ error: "Claude's response didn't contain valid JSON. Please try again." }),
+        };
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ error: `Couldn't parse Claude's JSON response: ${e.message}` }),
+        };
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ result: parsed }) };
     }
 
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
