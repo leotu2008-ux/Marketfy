@@ -1,683 +1,619 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketfy — Brand Intelligence</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Marketfy | Brand Intelligence Decoded</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  /* Cold Signal */
-  --abyss:#00050F;
-  --depth:#021428;
-  --depth2:#0a1d35;
-  --pulse:#0055A8;
-  --signal:#00A8FF;
-  --ice:#A8D8FF;
-  --bone:#F5F0E8;
-  /* Functional */
-  --bg:var(--abyss);
-  --surface:var(--depth);
-  --surface2:#072037;
-  --border:#0f3258;
-  --border-soft:#0a2540;
-  --text:var(--bone);
-  --text2:#bcb9ad;
-  --muted:#5a6b85;
-  --muted2:#3d4a60;
-  --danger:#FF6B6B;
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "error": "#ffb4ab",
+        "outline-variant": "#3e4852",
+        "surface": "#14130f",
+        "surface-container-lowest": "#0f0e0a",
+        "surface-container-low": "#021428",
+        "surface-container": "#21201b",
+        "surface-container-high": "#2b2a25",
+        "surface-container-highest": "#36352f",
+        "primary": "#95ccff",
+        "primary-container": "#00a8ff",
+        "secondary": "#a9c7ff",
+        "secondary-container": "#0356a9",
+        "on-secondary-container": "#b4ceff",
+        "tertiary": "#9cccf2",
+        "background": "#00050F",
+        "on-surface": "#e7e2da",
+        "on-surface-variant": "#bec7d3",
+        "outline": "#0F3258"
+      },
+      borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+      spacing: { "base": "4px", "gutter": "20px", "xs": "8px", "xl": "48px", "margin": "40px", "md": "24px", "sm": "16px", "lg": "32px" },
+      fontFamily: {
+        "display-lg": ["Geist"],
+        "data-mono": ["JetBrains Mono"],
+        "body-md": ["Geist"],
+        "label-caps": ["Geist"]
+      },
+      fontSize: {
+        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+        "data-mono": ["14px", {"lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "500"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+        "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.12em", "fontWeight": "600"}],
+        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+      }
+    }
+  }
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Geist',-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
-
-/* Background field */
-.bg-field{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 90% 50% at 20% 10%,rgba(0,168,255,.08) 0%,transparent 60%),
-             radial-gradient(ellipse 70% 50% at 80% 90%,rgba(0,85,168,.06) 0%,transparent 60%)}
-.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.4;
-  background-image:linear-gradient(rgba(15,50,88,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(15,50,88,.15) 1px,transparent 1px);
-  background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,#000,transparent 70%);
-  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,#000,transparent 70%)}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.018;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-/* ── NAV ── */
-.nav{position:sticky;top:0;z-index:100;background:rgba(0,5,15,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-soft)}
-.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
-.nav-brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;letter-spacing:-.3px;cursor:pointer}
-.nav-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--signal),var(--pulse));display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(0,168,255,.2),0 4px 14px rgba(0,168,255,.2)}
-.nav-mark svg{width:14px;height:14px}
-.nav-brand-text{font-weight:500;font-size:15px;letter-spacing:-.2px}
-.nav-links{display:flex;gap:4px}
-.nav-btn{padding:7px 14px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px;letter-spacing:-.1px}
-.nav-btn:hover{background:var(--surface);color:var(--text);border-color:var(--border-soft)}
-.nav-btn.active{background:var(--surface);color:var(--text);border-color:var(--border)}
-.soon-pill{font-size:9px;font-weight:600;letter-spacing:.4px;padding:2px 6px;border-radius:4px;background:var(--signal);color:var(--abyss)}
-
-/* ── PAGES ── */
-.page{display:none;animation:up .4s ease both}
-.page.active{display:block}
-
-/* ═══════════════ LANDING — SPLIT HERO ═══════════════ */
-.hero{padding:64px 32px 96px;max-width:1240px;margin:0 auto;position:relative;z-index:5}
-.hero-grid{display:grid;grid-template-columns:1fr 440px;gap:64px;align-items:center}
-@media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:48px}}
-
-.hero-left{position:relative;z-index:3}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:100px;background:rgba(0,168,255,.06);border:1px solid rgba(0,168,255,.18);color:var(--ice);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
-.hero-eyebrow-dot{width:5px;height:5px;background:var(--signal);border-radius:50%;animation:pulse 2s ease infinite;box-shadow:0 0 8px var(--signal)}
-.hero-title{font-size:clamp(38px,5.2vw,64px);font-weight:500;line-height:1.03;letter-spacing:-2px;margin-bottom:18px}
-.hero-title em{font-style:normal;font-weight:400;background:linear-gradient(135deg,var(--ice) 30%,var(--signal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:16px;color:var(--text2);line-height:1.6;max-width:460px;margin-bottom:32px;font-weight:400;letter-spacing:-.1px}
-
-/* Static mock browser panel, right column */
-.hero-right{position:relative;min-height:420px;display:flex;align-items:center;justify-content:center}
-.mock-panel{position:relative;width:100%;max-width:420px;aspect-ratio:16/11;border-radius:14px;background:linear-gradient(180deg,var(--depth),var(--abyss));border:1px solid var(--border);box-shadow:0 0 0 1px rgba(0,168,255,.06),0 40px 100px rgba(0,5,15,.6);overflow:hidden;animation:panelFloat 6s ease-in-out infinite}
-@keyframes panelFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.zoom-mock-bar{height:32px;background:var(--depth2);border-bottom:1px solid var(--border-soft);display:flex;align-items:center;padding:0 14px;gap:6px}
-.zm-dot{width:9px;height:9px;border-radius:50%}
-.zm-dot.r{background:#5b3030}.zm-dot.y{background:#5b4830}.zm-dot.g{background:#305b3a}
-.zoom-mock-body{padding:24px;display:flex;gap:12px}
-.zm-col{flex:1;display:flex;flex-direction:column;gap:8px}
-.zm-block{height:8px;background:rgba(0,168,255,.1);border-radius:3px}
-.zm-block.lg{height:14px;width:60%;background:rgba(0,168,255,.18)}
-.zm-block.short{width:40%}
-.zm-block.med{width:75%}
-
-/* Scan beam */
-.scan-beam{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--signal),transparent);box-shadow:0 0 30px var(--signal);animation:scanline 3s ease-in-out infinite;will-change:top}
-@keyframes scanline{0%{top:32px}50%{top:calc(100% - 4px)}100%{top:32px}}
-
-/* Floating label chips around mock */
-.float-chip{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:11px;color:var(--ice);font-weight:500;display:flex;align-items:center;gap:6px;letter-spacing:-.05px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,5,15,.4);z-index:2}
-.float-chip-dot{width:5px;height:5px;border-radius:50%;background:var(--signal);box-shadow:0 0 6px var(--signal)}
-.float-chip.f1{top:6%;left:0;animation:floaty 4s ease-in-out infinite}
-.float-chip.f2{top:18%;right:0;animation:floaty 4s ease-in-out 1s infinite}
-.float-chip.f3{bottom:14%;left:2%;animation:floaty 4s ease-in-out 2s infinite}
-.float-chip.f4{bottom:2%;right:4%;animation:floaty 4s ease-in-out 3s infinite}
-@media(max-width:960px){.float-chip{display:none}}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.input-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:14px;padding:8px;position:relative;box-shadow:0 0 0 1px rgba(0,168,255,.04),0 20px 60px rgba(0,5,15,.4)}
-.input-row{display:flex;gap:8px;align-items:stretch}
-input[type=url],input[type=text]{flex:1;background:transparent;border:none;padding:14px 18px;color:var(--text);font-size:16px;font-family:inherit;outline:none;min-width:0;letter-spacing:-.1px}
-input::placeholder{color:var(--muted)}
-.btn-main{background:var(--signal);border:none;border-radius:10px;padding:13px 26px;color:var(--abyss);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;display:inline-flex;align-items:center;gap:7px;letter-spacing:-.1px}
-.btn-main:hover{background:var(--ice);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,168,255,.3)}
-.btn-main:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-main svg{transition:transform .2s}
-.btn-main:not(:disabled):hover svg{transform:translateX(2px)}
-
-.progress{display:none;margin-top:14px;padding:0 12px}.progress.on{display:block}
-.bar{height:2px;background:var(--border-soft);border-radius:2px;overflow:hidden;margin-bottom:8px}
-.fill{height:100%;background:linear-gradient(90deg,var(--pulse),var(--signal),var(--ice));background-size:200%;animation:slide 1.6s ease infinite}
-.prog-text{font-size:12px;color:var(--muted);text-align:center;animation:blink 1.4s ease infinite;letter-spacing:.2px}
-.err{margin-top:12px;padding:11px 14px;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.25);border-radius:10px;color:var(--danger);font-size:13px;display:none}.err.on{display:block}
-.scan-info{margin-top:10px;font-size:12px;color:var(--signal);text-align:center;font-weight:500;display:none;align-items:center;justify-content:center;gap:8px}
-.scan-info.on{display:flex}
-.scan-info::before{content:'';width:5px;height:5px;background:var(--signal);border-radius:50%;box-shadow:0 0 8px var(--signal)}
-
-/* ── GLOBAL OPTS ── */
-.opts-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:12px;margin-top:14px;overflow:hidden}
-.opts-toggle{width:100%;background:none;border:none;padding:14px 18px;color:var(--text2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:color .18s;letter-spacing:-.05px}
-.opts-toggle:hover{color:var(--text)}
-.opts-toggle .arr{margin-left:auto;transition:transform .2s}
-.opts-toggle.open .arr{transform:rotate(180deg)}
-.opts-body{display:none;padding:0 18px 18px;border-top:1px solid var(--border-soft)}
-.opts-body.open{display:block;animation:up .2s ease both}
-.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:14px}
-.opts-full{grid-column:1/-1}
-.opt-field{display:flex;flex-direction:column;gap:5px}
-.opt-field label{font-size:10px;font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)}
-.opt-select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 30px 9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6b85' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s;letter-spacing:-.05px}
-.opt-select:focus{border-color:var(--signal)}
-.opt-select option{background:var(--surface)}
-.opt-textarea{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:64px;width:100%;transition:border-color .2s}
-.opt-textarea:focus{border-color:var(--signal)}
-.opt-textarea::placeholder{color:var(--muted)}
-
-/* ═══════════════ RESULTS ═══════════════ */
-#result{display:none;max-width:1100px;margin:0 auto;padding:0 24px 100px;position:relative;z-index:5}
-#result.on{display:block;animation:up .5s ease both}
-
-/* Brand strip header */
-.brand-strip{position:sticky;top:60px;z-index:90;background:rgba(0,5,15,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-soft);margin:0 -24px 28px;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bs-name{font-size:18px;font-weight:600;letter-spacing:-.4px}
-.bs-divider{width:1px;height:18px;background:var(--border)}
-.bs-stats{display:flex;gap:18px;font-size:11px;color:var(--muted);align-items:center;flex-wrap:wrap;letter-spacing:-.05px}
-.bs-stat{display:flex;align-items:center;gap:6px}
-.bs-stat strong{color:var(--text);font-weight:600;font-family:'Geist Mono',monospace}
-
-/* Tabs */
-.tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--surface);border:1px solid var(--border-soft);border-radius:11px;padding:4px}
-.tab{flex:1;padding:10px 8px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;text-align:center;letter-spacing:-.1px}
-.tab:hover{color:var(--text2)}
-.tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.4)}
-.tab-panel{display:none}
-.tab-panel.active{display:block;animation:up .3s ease both}
-
-/* Brand hero card */
-.brand-hero{background:linear-gradient(135deg,var(--depth) 0%,var(--depth2) 100%);border:1px solid var(--border);border-radius:18px;padding:40px 36px;margin-bottom:24px;position:relative;overflow:hidden}
-.brand-hero::before{content:'';position:absolute;top:-100px;right:-100px;width:340px;height:340px;background:radial-gradient(circle,rgba(0,168,255,.12),transparent 70%);pointer-events:none}
-.brand-hero::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,85,168,.1),transparent 70%);pointer-events:none}
-.bh-inner{position:relative;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
-@media(max-width:680px){.bh-inner{grid-template-columns:1fr;gap:28px}}
-.bh-eyebrow{font-size:10.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--signal);margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.bh-eyebrow::after{content:'';width:24px;height:1px;background:var(--signal)}
-.bh-name{font-size:clamp(36px,5vw,52px);font-weight:500;letter-spacing:-1px;line-height:1.05;margin-bottom:8px}
-.bh-tagline{font-size:18px;color:var(--ice);margin-bottom:18px;font-weight:400;letter-spacing:-.3px}
-.bh-desc{color:var(--text2);line-height:1.65;font-size:14.5px;max-width:520px;letter-spacing:-.05px}
-.bh-mark{width:120px;height:120px;border-radius:24px;background:linear-gradient(135deg,var(--signal),var(--pulse));display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(168,216,255,.15),0 12px 40px rgba(0,168,255,.25);position:relative;flex-shrink:0}
-.bh-mark::before{content:'';position:absolute;inset:6px;border-radius:18px;background:linear-gradient(135deg,rgba(168,216,255,.2),transparent)}
-.bh-mark-text{font-size:60px;font-weight:600;color:var(--bone);position:relative;line-height:1;letter-spacing:-2px}
-
-/* Section card */
-.s-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:16px;padding:26px;margin-bottom:16px;position:relative}
-.s-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}
-.s-title{display:flex;align-items:center;gap:10px}
-.s-title-num{font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;color:var(--signal);letter-spacing:.5px}
-.s-title-name{font-size:17px;font-weight:500;letter-spacing:-.4px}
-.s-actions{display:flex;gap:6px}
-.s-pill{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .18s;letter-spacing:-.05px}
-.s-pill:hover{border-color:var(--signal);color:var(--signal);background:rgba(0,168,255,.05)}
-.s-pill.active-opts{border-color:var(--ice);color:var(--ice);background:rgba(168,216,255,.08)}
-.s-pill.spinning svg{animation:spin 1s linear infinite}
-
-/* Section opts */
-.so-panel{display:none;background:var(--bg);border:1px solid var(--border-soft);border-radius:10px;padding:14px;margin-bottom:14px}
-.so-panel.open{display:block;animation:up .2s ease both}
-.so-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.so-full{grid-column:1/-1}
-.so-field{display:flex;flex-direction:column;gap:4px}
-.so-field label{font-size:9px;font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)}
-.so-sel{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 26px 7px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6b85' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s}
-.so-sel:focus{border-color:var(--signal)}
-.so-sel option{background:var(--surface)}
-.so-area{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none;resize:vertical;min-height:54px;width:100%;transition:border-color .2s}
-.so-area:focus{border-color:var(--signal)}
-.so-area::placeholder{color:var(--muted)}
-
-/* Bento-style asymmetric rows */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.g2.g2-colors{grid-template-columns:3fr 2fr}
-.g2.g2-voice{grid-template-columns:2fr 3fr}
-@media(max-width:680px){.g2{grid-template-columns:1fr}.g2.g2-colors,.g2.g2-voice{grid-template-columns:1fr}}
-
-/* COLOR GRID */
-.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
-.cs{background:var(--bg);border:1px solid var(--border-soft);border-radius:11px;overflow:hidden;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative}
-.cs:hover{transform:translateY(-2px);border-color:var(--signal);box-shadow:0 12px 28px rgba(0,168,255,.12)}
-.cs-fill{height:74px;position:relative;border-bottom:1px solid var(--border-soft)}
-.cs-copy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,5,15,.7);opacity:0;transition:opacity .2s;color:var(--bone);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;backdrop-filter:blur(2px)}
-.cs:hover .cs-copy{opacity:1}
-.cs.flashed .cs-copy{background:rgba(0,168,255,.85);opacity:1;color:var(--abyss)}
-.cs-info{padding:10px 12px}
-.cs-hex{font-family:'Geist Mono',monospace;font-size:11px;color:var(--text);font-weight:500;margin-bottom:2px}
-.cs-name{font-size:11.5px;color:var(--text2);font-weight:500;margin-bottom:1px}
-.cs-role{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:500}
-
-/* TYPOGRAPHY */
-.font-list{display:flex;flex-direction:column;gap:14px}
-.font-item{background:var(--bg);border:1px solid var(--border-soft);border-radius:11px;padding:18px;transition:border-color .18s}
-.font-item:hover{border-color:var(--border)}
-.fi-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.fi-role{font-size:9.5px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--signal)}
-.fi-name{font-size:11px;color:var(--text2);font-weight:500}
-.fi-sample{font-size:28px;line-height:1.15;color:var(--text);margin-bottom:8px;font-weight:500;letter-spacing:-.5px}
-.fi-usage{font-size:11.5px;color:var(--muted);font-style:italic;margin-top:6px}
-
-/* VOICE */
-.traits{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.trait{padding:5px 13px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid;letter-spacing:-.05px}
-.tone-desc{font-size:13.5px;color:var(--text2);line-height:1.7;font-style:italic;border-left:2px solid var(--signal);padding-left:14px}
-
-/* LOGO */
-.logo-concept-text{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px}
-.logo-prev-card{background:linear-gradient(135deg,var(--bg) 0%,var(--depth2) 100%);border:1px solid var(--border);border-radius:12px;padding:36px 24px;text-align:center;position:relative;overflow:hidden;min-height:140px;display:flex;align-items:center;justify-content:center}
-.logo-prev-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(0,168,255,.05),transparent 60%);pointer-events:none}
-.logo-prev{font-size:30px;font-weight:600;letter-spacing:-1px;position:relative}
-
-/* MESSAGES */
-.msgs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:580px){.msgs{grid-template-columns:1fr}}
-.msg{background:var(--bg);border:1px solid var(--border-soft);border-radius:11px;padding:18px;position:relative;transition:border-color .18s,transform .18s}
-.msg:hover{border-color:var(--signal);transform:translateY(-1px)}
-.msg-num{position:absolute;top:14px;right:16px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted);font-weight:500}
-.msg-type{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--signal);margin-bottom:8px;font-weight:600}
-.msg-text{font-size:13.5px;color:var(--text);line-height:1.55;font-weight:400}
-
-/* GUIDE */
-.guide-text{font-size:13.5px;line-height:1.85;color:var(--text2);white-space:pre-wrap}
-
-/* ACTIONS */
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
-.act-btn{flex:1;min-width:130px;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;text-align:center;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:-.05px}
-.act-btn:hover{border-color:var(--signal);color:var(--signal);background:var(--surface2)}
-.act-btn.primary{background:var(--signal);border-color:var(--signal);color:var(--abyss);font-weight:600}
-.act-btn.primary:hover{background:var(--ice);border-color:var(--ice);color:var(--abyss)}
-.act-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* BIZ CARD */
-.bc-layout{display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start}
-@media(max-width:880px){.bc-layout{grid-template-columns:1fr}}
-.bc-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:480px){.bc-fields{grid-template-columns:1fr}}
-.bc-field{display:flex;flex-direction:column;gap:5px}
-.bc-field label{font-size:10.5px;font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)}
-.bc-field input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .18s}
-.bc-field input:focus{border-color:var(--signal)}
-.bc-right{position:sticky;top:140px}
-.bc-styles{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.sty-btn{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;transition:all .18s;letter-spacing:-.05px}
-.sty-btn:hover{border-color:var(--signal);color:var(--signal)}
-.sty-btn.active{border-color:var(--signal);background:var(--signal);color:var(--abyss);font-weight:600}
-.bc-opts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-@media(max-width:480px){.bc-opts-row{grid-template-columns:1fr 1fr}}
-.bc-prev-lbl{font-size:10.5px;font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-canvas#bizcard{width:340px;height:190px;border-radius:10px;display:block;box-shadow:0 4px 16px rgba(0,5,15,.4),0 12px 40px rgba(0,5,15,.25);max-width:100%}
-
-/* SYNC PAGE */
-.sync-wrap{max-width:1100px;margin:0 auto;padding:80px 32px 100px;position:relative;z-index:5}
-.sync-hero{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-bottom:80px}
-@media(max-width:780px){.sync-hero{grid-template-columns:1fr;gap:40px}}
-.sync-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:100px;background:rgba(0,168,255,.06);border:1px solid rgba(0,168,255,.18);color:var(--ice);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
-.sync-eye-dot{width:5px;height:5px;background:var(--signal);border-radius:50%;animation:pulse 1.5s ease infinite;box-shadow:0 0 8px var(--signal)}
-.sync-title{font-size:clamp(42px,6.5vw,76px);font-weight:500;line-height:1;letter-spacing:-1.5px;margin-bottom:20px}
-.sync-title em{font-style:normal;font-weight:400;background:linear-gradient(135deg,var(--ice),var(--signal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sync-desc{font-size:15.5px;color:var(--text2);line-height:1.65;margin-bottom:32px;max-width:480px;letter-spacing:-.05px}
-.notify-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:12px;padding:6px;display:flex;gap:6px;max-width:440px;box-shadow:0 0 0 1px rgba(0,168,255,.04)}
-.notify-input{flex:1;background:transparent;border:none;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
-.notify-input::placeholder{color:var(--muted)}
-.notify-submit{background:var(--signal);border:none;border-radius:8px;padding:11px 22px;color:var(--abyss);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .18s}
-.notify-submit:hover{background:var(--ice)}
-.notify-ok{display:none;margin-top:10px;font-size:12px;font-weight:500;color:var(--signal);align-items:center;gap:6px}
-.notify-ok.on{display:flex}
-.sync-visual{background:linear-gradient(135deg,var(--depth) 0%,var(--depth2) 100%);border:1px solid var(--border);border-radius:18px;padding:36px;position:relative;overflow:hidden;aspect-ratio:1;display:flex;flex-direction:column;justify-content:center}
-.sync-visual::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,168,255,.12),transparent 70%)}
-.sv-inner{display:flex;flex-direction:column;gap:14px;position:relative}
-.sv-bar{height:7px;border-radius:4px;background:var(--surface2)}
-.sv-bar.b1{width:80%;background:var(--signal);animation:bw 3s ease-in-out infinite}
-.sv-bar.b2{width:55%;background:var(--ice);opacity:.6;animation:bw 3s ease-in-out .4s infinite}
-.sv-bar.b3{width:90%;background:var(--pulse);animation:bw 3s ease-in-out .8s infinite}
-.sv-bar.b4{width:40%;background:var(--signal);opacity:.4;animation:bw 3s ease-in-out 1.2s infinite}
-.sv-bar.b5{width:65%;background:var(--ice);opacity:.3;animation:bw 3s ease-in-out 1.6s infinite}
-.sv-thin{width:30%;height:2px;background:var(--surface2)}
-.sv-label{position:absolute;bottom:24px;left:36px;font-style:italic;font-size:22px;color:rgba(168,216,255,.18);font-weight:300}
-@keyframes bw{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.04)}}
-.sync-feats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:60px}
-@media(max-width:780px){.sync-feats{grid-template-columns:1fr}}
-.sf{border-top:2px solid var(--signal);padding-top:20px}
-.sf-num{font-family:'Geist Mono',monospace;font-size:11px;color:var(--signal);font-weight:500;margin-bottom:14px;letter-spacing:.5px}
-.sf-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:6px;letter-spacing:-.3px}
-.sf-desc{font-size:12.5px;color:var(--text2);line-height:1.6}
-
-/* ANIMS */
-@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-@keyframes slide{0%{background-position:0%}100%{background-position:200%}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-@media(max-width:640px){.hero{padding:44px 20px 64px}.opts-grid{grid-template-columns:1fr}.brand-strip{margin:0 -20px 24px;padding:12px 20px}.nav-inner{padding:0 20px}#result{padding:0 20px 80px}.sync-wrap{padding:60px 20px 80px}}
+</script>
+<style>
+body{background-color:#00050F;color:#e7e2da;overflow-x:hidden;font-family:'Geist',sans-serif}
+.noise-overlay{position:fixed;top:0;left:0;width:100%;height:100%;opacity:.03;z-index:9999;pointer-events:none;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.glass-panel{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(0,5,15,.7)}
+.glow-cyan{background:radial-gradient(circle at center,rgba(0,168,255,.15) 0%,transparent 70%)}
+.pulse-signal{animation:pulse-ring 2s cubic-bezier(.4,0,.6,1) infinite}
+@keyframes pulse-ring{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.1)}}
+.text-gradient-cyan{background:linear-gradient(90deg,#95ccff,#00a8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.scanner-container{position:relative;overflow:hidden}
+.scan-beam{position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#00a8ff,transparent);box-shadow:0 0 15px #00a8ff;z-index:10;animation:scan-move 4s linear infinite}
+@keyframes scan-move{0%{transform:translateY(-100%)}100%{transform:translateY(500%)}}
+.material-symbols-outlined{font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
+.bento-glow{position:relative}
+.bento-glow::after{content:"";position:absolute;inset:-1px;background:linear-gradient(45deg,transparent,rgba(0,168,255,.1),transparent);z-index:-1;border-radius:inherit}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spinning .material-symbols-outlined{animation:spin 1s linear infinite}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.rise{animation:rise .4s ease both}
+select.mfy,textarea.mfy,input.mfy-text{background:#00050F;border:1px solid #0F3258;border-radius:.5rem;padding:9px 12px;color:#e7e2da;font-size:13px;font-family:'Geist',sans-serif;outline:none;transition:border-color .2s;width:100%}
+select.mfy:focus,textarea.mfy:focus,input.mfy-text:focus{border-color:#00a8ff}
+select.mfy option{background:#021428}
 </style>
 </head>
-<body>
-<div class="bg-field"></div>
-<div class="grid-bg"></div>
+<body class="font-body-md selection:bg-primary/30">
+<div class="noise-overlay"></div>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <div class="nav-brand" onclick="showPage('home',document.getElementById('nav-home'))">
-      <div class="nav-mark">
-        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 13 L2 4 L4.5 4 L8 9 L11.5 4 L14 4 L14 13 L12 13 L12 7.5 L9 12 L7 12 L4 7.5 L4 13 Z" fill="#F5F0E8"/>
-        </svg>
+<!-- Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 glass-panel border-b border-outline-variant">
+  <div class="flex justify-between items-center px-6 md:px-margin py-xs max-w-full mx-auto">
+    <div class="flex items-center gap-sm cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <div class="w-8 h-8 rounded-md bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center shadow-[0_0_14px_rgba(0,168,255,.35)]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"><path d="M2 13 L2 4 L4.5 4 L8 9 L11.5 4 L14 4 L14 13 L12 13 L12 7.5 L9 12 L7 12 L4 7.5 L4 13 Z" fill="#F5F0E8"/></svg>
       </div>
-      <span class="nav-brand-text">marketfy</span>
+      <span class="font-display-lg text-headline-md font-bold tracking-tighter text-primary">marketfy</span>
     </div>
-    <div class="nav-links">
-      <button class="nav-btn active" id="nav-home" onclick="showPage('home',this)">Brand Guide</button>
-      <button class="nav-btn" id="nav-sync" onclick="showPage('sync',this)">SYNC <span class="soon-pill">Soon</span></button>
+    <div class="hidden md:flex items-center gap-lg">
+      <a class="text-primary border-b-2 border-primary pb-1 font-body-md transition-all cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">Brand Guide</a>
+      <div class="relative flex items-center gap-xs text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer group">
+        <span class="font-body-md">SYNC</span>
+        <span class="bg-secondary-container text-on-secondary-container text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Soon</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-md">
+      <button class="p-xs text-on-surface-variant hover:bg-surface-container-highest/50 rounded-full transition-all active:scale-90">
+        <span class="material-symbols-outlined">account_circle</span>
+      </button>
     </div>
   </div>
 </nav>
 
-<!-- ── PAGE: HOME ── -->
-<div class="page active" id="page-home">
+<!-- Main Content -->
+<main class="relative pt-32 pb-xl min-h-screen">
+  <!-- Atmospheric Glows -->
+  <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] glow-cyan -z-10 blur-[100px]"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] glow-cyan opacity-50 -z-10 blur-[80px]"></div>
 
-  <!-- HERO — split layout, input visible immediately -->
-  <div class="hero">
-    <div class="hero-grid">
-      <div class="hero-left">
-        <div class="hero-eyebrow"><div class="hero-eyebrow-dot"></div>Brand Intelligence</div>
-        <h1 class="hero-title">Build your brand,<br><em>decoded.</em></h1>
-        <p class="hero-sub">Marketfy scans your entire site, extracts real colors and fonts, and generates a complete brand package — instantly.</p>
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-6 md:px-margin grid grid-cols-1 lg:grid-cols-12 gap-xl items-center">
+    <!-- Left Column: Content & Inputs -->
+    <div class="lg:col-span-6 flex flex-col gap-lg">
+      <div class="inline-flex items-center gap-xs px-sm py-xs bg-primary/10 border border-primary/20 rounded-full w-fit">
+        <div class="w-2 h-2 rounded-full bg-primary pulse-signal"></div>
+        <span class="font-label-caps text-label-caps uppercase tracking-widest text-primary">Brand Intelligence</span>
+      </div>
+      <div class="flex flex-col">
+        <h1 class="font-display-lg text-[48px] lg:text-[68px] leading-none mb-4 font-bold tracking-tighter">
+          Build your brand,<br/>
+          <span class="text-gradient-cyan">decoded.</span>
+        </h1>
+        <p class="font-body-lg text-on-surface-variant max-w-lg">
+          Operate with clinical precision. Marketfy analyzes your digital footprint to extract core DNA, color systems, and strategic positioning in real-time.
+        </p>
+      </div>
 
-        <div class="input-card">
-          <div class="input-row">
-            <input type="url" id="urlInput" placeholder="https://yourcompany.com" />
-            <button class="btn-main" id="genBtn" onclick="start()">
-              Analyze
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-          </div>
-          <div class="progress" id="progress">
-            <div class="bar"><div class="fill"></div></div>
-            <div class="prog-text" id="progText">Scanning your website...</div>
-          </div>
-        </div>
-        <div class="err" id="errMsg"></div>
-        <div class="scan-info" id="scanInfo"></div>
-
-        <div class="opts-card">
-          <button class="opts-toggle" id="optsToggle" onclick="toggleOpts()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-            Generation options
-            <svg class="arr" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      <!-- Input Card -->
+      <div class="p-md bg-surface-container-low border border-outline rounded-xl flex flex-col gap-sm shadow-2xl">
+        <div class="relative group">
+          <input id="urlInput" class="w-full bg-[#00050F] border border-outline rounded-full pl-6 pr-36 py-4 text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-outline text-[15px]" placeholder="Enter your brand URL (e.g. marketfy.ai)" type="text"/>
+          <button id="genBtn" onclick="start()" class="absolute right-2 top-1/2 -translate-y-1/2 h-11 px-5 bg-primary-container text-[#00050F] rounded-full font-bold hover:brightness-110 active:scale-95 transition-all flex items-center gap-xs disabled:opacity-40 disabled:cursor-not-allowed text-sm">
+            Analyze <span class="material-symbols-outlined text-base">arrow_forward</span>
           </button>
-          <div class="opts-body" id="optsBody">
-            <div class="opts-grid">
-              <div class="opt-field"><label>Brand tone</label>
-                <select class="opt-select" id="opt-tone"><option value="">Auto-detect</option><option value="professional">Professional</option><option value="friendly">Friendly</option><option value="bold">Bold</option><option value="luxury">Luxury</option><option value="playful">Playful</option><option value="minimal">Minimal</option></select></div>
-              <div class="opt-field"><label>Industry</label>
-                <select class="opt-select" id="opt-industry"><option value="">Auto-detect</option><option value="tech">Technology / SaaS</option><option value="ecommerce">E-commerce</option><option value="health">Health</option><option value="finance">Finance</option><option value="creative">Creative</option><option value="food">Food &amp; Beverage</option><option value="education">Education</option><option value="nonprofit">Non-profit</option></select></div>
-              <div class="opt-field"><label>Color style</label>
-                <select class="opt-select" id="opt-colorstyle"><option value="">Use detected</option><option value="vibrant">Vibrant</option><option value="muted">Muted</option><option value="dark">Dark</option><option value="light">Light</option><option value="monochrome">Monochrome</option><option value="pastel">Pastel</option></select></div>
-              <div class="opt-field"><label>Audience</label>
-                <select class="opt-select" id="opt-audience"><option value="">Auto-detect</option><option value="b2b">B2B</option><option value="b2c">B2C</option><option value="enterprise">Enterprise</option><option value="startup">Startups</option><option value="youth">Young adults</option><option value="professional">Professionals</option></select></div>
-              <div class="opt-field"><label>Guide length</label>
-                <select class="opt-select" id="opt-length"><option value="standard">Standard</option><option value="concise">Concise</option><option value="detailed">Detailed</option></select></div>
-              <div class="opt-field"><label>Typography</label>
-                <select class="opt-select" id="opt-typepref"><option value="">Auto-suggest</option><option value="serif">Serif</option><option value="sans">Modern sans</option><option value="geometric">Geometric</option><option value="humanist">Humanist</option><option value="display">Display</option></select></div>
-              <div class="opt-field opts-full"><label>Additional instructions</label>
-                <textarea class="opt-textarea" id="opt-custom" placeholder="e.g. Emphasize sustainability, focus on premium..."></textarea></div>
+        </div>
+
+        <!-- Progress -->
+        <div id="progress" class="hidden px-2">
+          <div class="h-[2px] bg-outline/40 rounded overflow-hidden mb-2">
+            <div class="h-full w-full bg-gradient-to-r from-secondary-container via-primary-container to-primary animate-pulse"></div>
+          </div>
+          <div id="progText" class="font-data-mono text-[11px] text-on-surface-variant text-center uppercase tracking-wider animate-pulse">Scanning your website...</div>
+        </div>
+
+        <!-- Accordion: real generation options -->
+        <div class="mt-xs">
+          <button id="optsToggle" class="flex items-center justify-between w-full text-on-surface-variant hover:text-primary transition-colors text-body-md" onclick="toggleOpts()">
+            <span class="font-label-caps text-label-caps uppercase tracking-widest">Generation options</span>
+            <span class="material-symbols-outlined transition-transform" id="accordion-icon">expand_more</span>
+          </button>
+          <div class="hidden overflow-hidden mt-md" id="optsBody">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Brand tone</span>
+                <select class="mfy" id="opt-tone"><option value="">Auto-detect</option><option value="professional">Professional</option><option value="friendly">Friendly</option><option value="bold">Bold</option><option value="luxury">Luxury</option><option value="playful">Playful</option><option value="minimal">Minimal</option></select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Industry</span>
+                <select class="mfy" id="opt-industry"><option value="">Auto-detect</option><option value="tech">Technology / SaaS</option><option value="ecommerce">E-commerce</option><option value="health">Health</option><option value="finance">Finance</option><option value="creative">Creative</option><option value="food">Food &amp; Beverage</option><option value="education">Education</option><option value="nonprofit">Non-profit</option></select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Color style</span>
+                <select class="mfy" id="opt-colorstyle"><option value="">Use detected</option><option value="vibrant">Vibrant</option><option value="muted">Muted</option><option value="dark">Dark</option><option value="light">Light</option><option value="monochrome">Monochrome</option><option value="pastel">Pastel</option></select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Audience</span>
+                <select class="mfy" id="opt-audience"><option value="">Auto-detect</option><option value="b2b">B2B</option><option value="b2c">B2C</option><option value="enterprise">Enterprise</option><option value="startup">Startups</option><option value="youth">Young adults</option><option value="professional">Professionals</option></select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Guide length</span>
+                <select class="mfy" id="opt-length"><option value="standard">Standard</option><option value="concise">Concise</option><option value="detailed">Detailed</option></select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Typography</span>
+                <select class="mfy" id="opt-typepref"><option value="">Auto-suggest</option><option value="serif">Serif</option><option value="sans">Modern sans</option><option value="geometric">Geometric</option><option value="humanist">Humanist</option><option value="display">Display</option></select>
+              </label>
+              <label class="flex flex-col gap-1 sm:col-span-2">
+                <span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Additional instructions</span>
+                <textarea class="mfy min-h-[64px] resize-y" id="opt-custom" placeholder="e.g. Emphasize sustainability, focus on premium..."></textarea>
+              </label>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="hero-right">
-        <div class="mock-panel">
-          <div class="zoom-mock-bar">
-            <div class="zm-dot r"></div><div class="zm-dot y"></div><div class="zm-dot g"></div>
+      <!-- Error + Scan info -->
+      <div id="errMsg" class="hidden px-4 py-3 bg-error/10 border border-error/30 rounded-lg text-error text-body-md"></div>
+      <div id="scanInfo" class="hidden items-center gap-xs font-data-mono text-[11px] text-primary uppercase tracking-wider">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_8px_#00a8ff] inline-block"></span>
+        <span id="scanInfoText"></span>
+      </div>
+    </div>
+
+    <!-- Right Column: Visualizer -->
+    <div class="lg:col-span-6 relative" id="visualizer">
+      <div class="relative w-full aspect-[4/3] bg-surface-container-low border border-outline rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,168,255,0.1)] hover:scale-[1.01] transition-transform duration-500">
+        <div class="flex items-center gap-xs px-md py-sm border-b border-outline bg-background/50">
+          <div class="flex gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-error/40"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-tertiary/40"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
           </div>
-          <div class="zoom-mock-body">
-            <div class="zm-col">
-              <div class="zm-block lg"></div>
-              <div class="zm-block med"></div>
-              <div class="zm-block short"></div>
-              <div class="zm-block"></div>
-              <div class="zm-block med"></div>
-            </div>
-            <div class="zm-col">
-              <div class="zm-block med"></div>
-              <div class="zm-block lg" style="background:rgba(168,216,255,.25)"></div>
-              <div class="zm-block"></div>
-              <div class="zm-block short"></div>
-            </div>
+          <div class="ml-md bg-background px-md py-1 rounded text-[10px] text-outline border border-outline/30 flex-1 max-w-[200px] font-data-mono">
+            marketfy.ai/brand-scanner
           </div>
+        </div>
+        <div class="scanner-container relative p-lg h-full">
           <div class="scan-beam"></div>
+          <div class="relative z-0 flex flex-col gap-md opacity-40">
+            <div class="flex items-center gap-md">
+              <div class="w-16 h-16 rounded-lg bg-outline/20"></div>
+              <div class="flex-1 flex flex-col gap-xs">
+                <div class="h-4 w-1/2 bg-outline/20 rounded"></div>
+                <div class="h-3 w-1/3 bg-outline/20 rounded"></div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-sm">
+              <div class="h-32 bg-outline/20 rounded-lg"></div>
+              <div class="h-32 bg-outline/20 rounded-lg"></div>
+              <div class="h-32 bg-outline/20 rounded-lg"></div>
+            </div>
+            <div class="h-20 bg-outline/20 rounded-lg w-full"></div>
+          </div>
         </div>
-        <div class="float-chip f1"><div class="float-chip-dot"></div>Color extracted</div>
-        <div class="float-chip f2"><div class="float-chip-dot"></div>Font detected</div>
-        <div class="float-chip f3"><div class="float-chip-dot"></div>Tone analyzed</div>
-        <div class="float-chip f4"><div class="float-chip-dot"></div>Brand decoded</div>
+      </div>
+      <div class="hidden lg:flex absolute top-10 -right-4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container shadow-lg animate-bounce [animation-duration:3s]">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">palette</span>
+        <span class="font-label-caps text-label-caps uppercase text-on-surface">Color extracted</span>
+      </div>
+      <div class="hidden lg:flex absolute bottom-20 -left-8 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/50 shadow-lg animate-pulse">
+        <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1;">text_fields</span>
+        <span class="font-label-caps text-label-caps uppercase text-on-surface">Font detected</span>
+      </div>
+      <div class="hidden lg:flex absolute -bottom-4 right-1/4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/30 shadow-lg">
+        <span class="material-symbols-outlined text-primary">radar</span>
+        <span class="font-label-caps text-label-caps uppercase text-on-surface">DNA Sequence Verified</span>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ═════════ RESULTS ═════════ -->
-  <div id="result">
-    <div class="brand-strip">
-      <div class="bs-name" id="bsName"></div>
-      <div class="bs-divider"></div>
-      <div class="bs-stats" id="bsStats"></div>
+  <!-- ═══════════ RESULTS ═══════════ -->
+  <section id="result" class="hidden max-w-7xl mx-auto px-6 md:px-margin mt-xl">
+    <!-- Sticky strip -->
+    <div class="sticky top-[57px] z-40 glass-panel border-b border-outline/40 -mx-6 md:-mx-margin px-6 md:px-margin py-3 mb-lg flex items-center gap-4 flex-wrap">
+      <span id="bsName" class="font-bold text-lg tracking-tight"></span>
+      <span class="w-px h-4 bg-outline"></span>
+      <span id="bsStats" class="flex gap-4 font-data-mono text-[11px] text-on-surface-variant uppercase tracking-wider"></span>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('brand',this)">Brand Guide</button>
-      <button class="tab" onclick="switchTab('bizcard',this)">Business Card</button>
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-lg bg-surface-container-low border border-outline/50 rounded-xl p-1 max-w-md">
+      <button class="tab-btn flex-1 py-2.5 rounded-lg text-sm font-medium transition-all bg-secondary-container/40 text-primary" data-tab="brand" onclick="switchTab('brand',this)">Brand Guide</button>
+      <button class="tab-btn flex-1 py-2.5 rounded-lg text-sm font-medium transition-all text-on-surface-variant hover:text-on-surface" data-tab="bizcard" onclick="switchTab('bizcard',this)">Business Card</button>
     </div>
 
-    <div class="tab-panel active" id="tab-brand">
-      <div class="brand-hero">
-        <div class="bh-inner">
+    <!-- TAB: BRAND -->
+    <div id="tab-brand" class="tab-panel rise">
+      <!-- Brand hero -->
+      <div class="relative overflow-hidden bg-surface-container-low border border-outline rounded-xl p-8 md:p-10 mb-md bento-glow">
+        <div class="absolute -top-24 -right-24 w-80 h-80 glow-cyan blur-[60px] pointer-events-none"></div>
+        <div class="relative grid grid-cols-1 md:grid-cols-[1fr_auto] gap-8 items-center">
           <div>
-            <div class="bh-eyebrow">Brand Identity</div>
-            <div class="bh-name" id="bName"></div>
-            <div class="bh-tagline" id="bTagline"></div>
-            <div class="bh-desc" id="bDesc"></div>
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-3">// BRAND_IDENTITY</div>
+            <div id="bName" class="text-[40px] md:text-[52px] font-bold tracking-tighter leading-none mb-2"></div>
+            <div id="bTagline" class="text-lg text-tertiary mb-4"></div>
+            <div id="bDesc" class="text-on-surface-variant text-body-md leading-relaxed max-w-xl"></div>
           </div>
-          <div class="bh-mark" id="bhMark"><span class="bh-mark-text" id="bhMarkText">M</span></div>
+          <div id="bhMark" class="w-28 h-28 rounded-xl bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center shadow-[0_0_40px_rgba(0,168,255,.25)] shrink-0">
+            <span id="bhMarkText" class="text-5xl font-bold text-white">M</span>
+          </div>
         </div>
       </div>
 
-      <div class="g2 g2-colors">
-        <div class="s-card">
-          <div class="s-hd">
-            <div class="s-title"><span class="s-title-num">01</span><span class="s-title-name">Color Palette</span></div>
-            <div class="s-actions">
-              <button class="s-pill" onclick="toggleSO('so-colors',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> Options</button>
-              <button class="s-pill" onclick="regenSec('colors','so-colors',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Regenerate</button>
+      <!-- Row: colors + typography -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-md mb-md">
+        <div class="md:col-span-3 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+          <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 01_COLOR_SYSTEM</div>
+            <div class="flex gap-2">
+              <button class="pill" onclick="toggleSO('so-colors',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
+              <button class="pill" onclick="regenSec('colors','so-colors',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
             </div>
           </div>
-          <div class="so-panel" id="so-colors">
-            <div class="so-grid">
-              <div class="so-field"><label>Mood</label><select class="so-sel" id="so-colors-mood"><option value="">Keep current</option><option value="vibrant">Vibrant</option><option value="muted">Muted</option><option value="dark">Dark</option><option value="light">Light</option><option value="pastel">Pastel</option><option value="monochrome">Monochrome</option></select></div>
-              <div class="so-field"><label>Count</label><select class="so-sel" id="so-colors-count"><option value="5">5 colors</option><option value="4">4 colors</option><option value="6">6 colors</option><option value="3">3 colors</option></select></div>
-              <div class="so-field so-full"><label>Instructions</label><textarea class="so-area" id="so-colors-custom" placeholder="e.g. Include warm amber, avoid greens..."></textarea></div>
+          <div class="so-panel hidden bg-background border border-outline/50 rounded-lg p-sm mb-sm" id="so-colors">
+            <div class="grid grid-cols-2 gap-sm">
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Mood</span><select class="mfy" id="so-colors-mood"><option value="">Keep current</option><option value="vibrant">Vibrant</option><option value="muted">Muted</option><option value="dark">Dark</option><option value="light">Light</option><option value="pastel">Pastel</option><option value="monochrome">Monochrome</option></select></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Count</span><select class="mfy" id="so-colors-count"><option value="5">5 colors</option><option value="4">4 colors</option><option value="6">6 colors</option><option value="3">3 colors</option></select></label>
+              <label class="flex flex-col gap-1 col-span-2"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Instructions</span><textarea class="mfy min-h-[54px]" id="so-colors-custom" placeholder="e.g. Include warm amber, avoid greens..."></textarea></label>
             </div>
           </div>
-          <div class="color-grid" id="colorGrid"></div>
+          <div id="colorGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-sm"></div>
         </div>
 
-        <div class="s-card">
-          <div class="s-hd">
-            <div class="s-title"><span class="s-title-num">02</span><span class="s-title-name">Typography</span></div>
-            <div class="s-actions">
-              <button class="s-pill" onclick="toggleSO('so-typo',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> Options</button>
-              <button class="s-pill" onclick="regenSec('typography','so-typo',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Regenerate</button>
+        <div class="md:col-span-2 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+          <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 02_TYPOGRAPHY</div>
+            <div class="flex gap-2">
+              <button class="pill" onclick="toggleSO('so-typo',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
+              <button class="pill" onclick="regenSec('typography','so-typo',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
             </div>
           </div>
-          <div class="so-panel" id="so-typo">
-            <div class="so-grid">
-              <div class="so-field"><label>Style</label><select class="so-sel" id="so-typo-style"><option value="">Auto</option><option value="serif">Serif</option><option value="modern-sans">Modern sans</option><option value="geometric">Geometric</option><option value="humanist">Humanist</option><option value="display">Display</option></select></div>
-              <div class="so-field"><label>Source</label><select class="so-sel" id="so-typo-source"><option value="google">Google Fonts</option><option value="premium">Premium</option><option value="system">System</option></select></div>
-              <div class="so-field so-full"><label>Instructions</label><textarea class="so-area" id="so-typo-custom" placeholder="e.g. Editorial headline, readable body..."></textarea></div>
+          <div class="so-panel hidden bg-background border border-outline/50 rounded-lg p-sm mb-sm" id="so-typo">
+            <div class="grid grid-cols-2 gap-sm">
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Style</span><select class="mfy" id="so-typo-style"><option value="">Auto</option><option value="serif">Serif</option><option value="modern-sans">Modern sans</option><option value="geometric">Geometric</option><option value="humanist">Humanist</option><option value="display">Display</option></select></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Source</span><select class="mfy" id="so-typo-source"><option value="google">Google Fonts</option><option value="premium">Premium</option><option value="system">System</option></select></label>
+              <label class="flex flex-col gap-1 col-span-2"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Instructions</span><textarea class="mfy min-h-[54px]" id="so-typo-custom" placeholder="e.g. Editorial headline, readable body..."></textarea></label>
             </div>
           </div>
-          <div class="font-list" id="fontList"></div>
+          <div id="fontList" class="flex flex-col gap-sm"></div>
         </div>
       </div>
 
-      <div class="g2 g2-voice">
-        <div class="s-card">
-          <div class="s-hd">
-            <div class="s-title"><span class="s-title-num">03</span><span class="s-title-name">Voice &amp; Tone</span></div>
-            <div class="s-actions">
-              <button class="s-pill" onclick="toggleSO('so-voice',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> Options</button>
-              <button class="s-pill" onclick="regenSec('voiceAndTone','so-voice',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Regenerate</button>
+      <!-- Row: voice + logo -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-md mb-md">
+        <div class="md:col-span-2 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+          <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 03_VOICE_TONE</div>
+            <div class="flex gap-2">
+              <button class="pill" onclick="toggleSO('so-voice',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
+              <button class="pill" onclick="regenSec('voiceAndTone','so-voice',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
             </div>
           </div>
-          <div class="so-panel" id="so-voice">
-            <div class="so-grid">
-              <div class="so-field"><label>Direction</label><select class="so-sel" id="so-voice-tone"><option value="">From site</option><option value="professional">Professional</option><option value="conversational">Conversational</option><option value="authoritative">Authoritative</option><option value="empathetic">Empathetic</option><option value="bold">Bold</option><option value="playful">Playful</option></select></div>
-              <div class="so-field"><label>Style</label><select class="so-sel" id="so-voice-style"><option value="">Auto</option><option value="formal">Formal</option><option value="casual">Casual</option><option value="technical">Technical</option><option value="storytelling">Storytelling</option></select></div>
-              <div class="so-field so-full"><label>Instructions</label><textarea class="so-area" id="so-voice-custom" placeholder="e.g. Trusted advisor tone, no jargon..."></textarea></div>
+          <div class="so-panel hidden bg-background border border-outline/50 rounded-lg p-sm mb-sm" id="so-voice">
+            <div class="grid grid-cols-2 gap-sm">
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Direction</span><select class="mfy" id="so-voice-tone"><option value="">From site</option><option value="professional">Professional</option><option value="conversational">Conversational</option><option value="authoritative">Authoritative</option><option value="empathetic">Empathetic</option><option value="bold">Bold</option><option value="playful">Playful</option></select></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Style</span><select class="mfy" id="so-voice-style"><option value="">Auto</option><option value="formal">Formal</option><option value="casual">Casual</option><option value="technical">Technical</option><option value="storytelling">Storytelling</option></select></label>
+              <label class="flex flex-col gap-1 col-span-2"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Instructions</span><textarea class="mfy min-h-[54px]" id="so-voice-custom" placeholder="e.g. Trusted advisor tone, no jargon..."></textarea></label>
             </div>
           </div>
-          <div class="traits" id="traits"></div>
-          <div class="tone-desc" id="toneDesc"></div>
+          <div id="traits" class="flex flex-wrap gap-2 mb-sm"></div>
+          <div id="toneDesc" class="text-body-md text-on-surface-variant italic leading-relaxed border-l-2 border-primary-container pl-4"></div>
         </div>
 
-        <div class="s-card">
-          <div class="s-hd"><div class="s-title"><span class="s-title-num">04</span><span class="s-title-name">Logo Concept</span></div></div>
-          <div class="logo-concept-text" id="logoConcept"></div>
-          <div class="logo-prev-card"><div class="logo-prev" id="logoPrev"></div></div>
+        <div class="md:col-span-3 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-md">// 04_LOGO_CONCEPT</div>
+          <div id="logoConcept" class="text-body-md text-on-surface-variant leading-relaxed mb-sm"></div>
+          <div class="relative overflow-hidden bg-background border border-outline rounded-lg min-h-[140px] flex items-center justify-center p-8">
+            <div class="absolute inset-0 glow-cyan opacity-40 pointer-events-none"></div>
+            <div id="logoPrev" class="relative text-3xl font-bold tracking-tight"></div>
+          </div>
         </div>
       </div>
 
-      <div class="s-card">
-        <div class="s-hd">
-          <div class="s-title"><span class="s-title-num">05</span><span class="s-title-name">Key Messages</span></div>
-          <div class="s-actions">
-            <button class="s-pill" onclick="toggleSO('so-msgs',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> Options</button>
-            <button class="s-pill" onclick="regenSec('keyMessages','so-msgs',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Regenerate</button>
+      <!-- Key messages -->
+      <div class="bg-surface-container-low border border-outline rounded-xl p-md mb-md bento-glow">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
+          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 05_KEY_MESSAGES</div>
+          <div class="flex gap-2">
+            <button class="pill" onclick="toggleSO('so-msgs',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
+            <button class="pill" onclick="regenSec('keyMessages','so-msgs',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
           </div>
         </div>
-        <div class="so-panel" id="so-msgs">
-          <div class="so-grid">
-            <div class="so-field"><label>Focus</label><select class="so-sel" id="so-msgs-focus"><option value="">Balanced</option><option value="growth">Growth</option><option value="trust">Trust</option><option value="innovation">Innovation</option><option value="community">Community</option><option value="value">Value</option><option value="premium">Premium</option></select></div>
-            <div class="so-field"><label>CTA style</label><select class="so-sel" id="so-msgs-cta"><option value="">Auto</option><option value="urgent">Urgent</option><option value="inviting">Inviting</option><option value="benefit">Benefit-led</option><option value="question">Question</option></select></div>
-            <div class="so-field so-full"><label>Instructions</label><textarea class="so-area" id="so-msgs-custom" placeholder="e.g. Emphasize free trial..."></textarea></div>
+        <div class="so-panel hidden bg-background border border-outline/50 rounded-lg p-sm mb-sm" id="so-msgs">
+          <div class="grid grid-cols-2 gap-sm">
+            <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Focus</span><select class="mfy" id="so-msgs-focus"><option value="">Balanced</option><option value="growth">Growth</option><option value="trust">Trust</option><option value="innovation">Innovation</option><option value="community">Community</option><option value="value">Value</option><option value="premium">Premium</option></select></label>
+            <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">CTA style</span><select class="mfy" id="so-msgs-cta"><option value="">Auto</option><option value="urgent">Urgent</option><option value="inviting">Inviting</option><option value="benefit">Benefit-led</option><option value="question">Question</option></select></label>
+            <label class="flex flex-col gap-1 col-span-2"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Instructions</span><textarea class="mfy min-h-[54px]" id="so-msgs-custom" placeholder="e.g. Emphasize free trial..."></textarea></label>
           </div>
         </div>
-        <div class="msgs" id="msgs"></div>
+        <div id="msgs" class="grid grid-cols-1 sm:grid-cols-2 gap-sm"></div>
       </div>
 
-      <div class="s-card">
-        <div class="s-hd">
-          <div class="s-title"><span class="s-title-num">06</span><span class="s-title-name">Full Brand Guide</span></div>
-          <div class="s-actions">
-            <button class="s-pill" onclick="toggleSO('so-guide',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg> Options</button>
-            <button class="s-pill" onclick="regenSec('fullGuide','so-guide',this)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Regenerate</button>
+      <!-- Full guide -->
+      <div class="bg-surface-container-low border border-outline rounded-xl p-md mb-md bento-glow">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
+          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 06_FULL_BRAND_GUIDE</div>
+          <div class="flex gap-2">
+            <button class="pill" onclick="toggleSO('so-guide',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
+            <button class="pill" onclick="regenSec('fullGuide','so-guide',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
           </div>
         </div>
-        <div class="so-panel" id="so-guide">
-          <div class="so-grid">
-            <div class="so-field"><label>Length</label><select class="so-sel" id="so-guide-length"><option value="standard">Standard</option><option value="concise">Concise</option><option value="detailed">Detailed</option></select></div>
-            <div class="so-field"><label>Emphasis</label><select class="so-sel" id="so-guide-emphasis"><option value="">All</option><option value="visual">Visual identity</option><option value="voice">Voice &amp; tone</option><option value="strategy">Strategy</option><option value="audience">Audience</option></select></div>
-            <div class="so-field so-full"><label>Instructions</label><textarea class="so-area" id="so-guide-custom" placeholder="e.g. Social media guidelines, second person..."></textarea></div>
+        <div class="so-panel hidden bg-background border border-outline/50 rounded-lg p-sm mb-sm" id="so-guide">
+          <div class="grid grid-cols-2 gap-sm">
+            <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Length</span><select class="mfy" id="so-guide-length"><option value="standard">Standard</option><option value="concise">Concise</option><option value="detailed">Detailed</option></select></label>
+            <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Emphasis</span><select class="mfy" id="so-guide-emphasis"><option value="">All</option><option value="visual">Visual identity</option><option value="voice">Voice &amp; tone</option><option value="strategy">Strategy</option><option value="audience">Audience</option></select></label>
+            <label class="flex flex-col gap-1 col-span-2"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Instructions</span><textarea class="mfy min-h-[54px]" id="so-guide-custom" placeholder="e.g. Social media guidelines, second person..."></textarea></label>
           </div>
         </div>
-        <div class="guide-text" id="guideText"></div>
+        <div id="guideText" class="text-body-md text-on-surface-variant leading-[1.85] whitespace-pre-wrap"></div>
       </div>
 
-      <div class="actions">
-        <button class="act-btn" onclick="copyGuide()">Copy Guide</button>
-        <button class="act-btn" onclick="dlTxt()">Download .txt</button>
-        <button class="act-btn primary" id="pdfBtn" onclick="dlPDF()">Download PDF</button>
-      </div>
-    </div>
-
-    <div class="tab-panel" id="tab-bizcard">
-      <div class="bc-layout">
-        <div>
-          <div class="s-card">
-            <div class="s-hd"><div class="s-title"><span class="s-title-num">01</span><span class="s-title-name">Card Details</span></div></div>
-            <div class="bc-fields">
-              <div class="bc-field"><label>Full Name</label><input type="text" id="bc-name" placeholder="Jane Smith" oninput="renderCard()"></div>
-              <div class="bc-field"><label>Job Title</label><input type="text" id="bc-title" placeholder="Founder &amp; CEO" oninput="renderCard()"></div>
-              <div class="bc-field"><label>Email</label><input type="text" id="bc-email" placeholder="jane@company.com" oninput="renderCard()"></div>
-              <div class="bc-field"><label>Phone</label><input type="text" id="bc-phone" placeholder="+1 (555) 000-0000" oninput="renderCard()"></div>
-              <div class="bc-field"><label>Website</label><input type="text" id="bc-website" placeholder="company.com" oninput="renderCard()"></div>
-              <div class="bc-field"><label>Company</label><input type="text" id="bc-company" placeholder="Acme Inc." oninput="renderCard()"></div>
-            </div>
-          </div>
-          <div class="s-card">
-            <div class="s-hd"><div class="s-title"><span class="s-title-num">02</span><span class="s-title-name">Customization</span></div></div>
-            <div class="bc-opts-row">
-              <div class="so-field"><label>Color</label><select class="so-sel" id="bc-color" onchange="renderCard()"><option value="">Brand colors</option><option value="mono-dark">Mono dark</option><option value="mono-light">Mono light</option><option value="accent">Accent only</option></select></div>
-              <div class="so-field"><label>Decoration</label><select class="so-sel" id="bc-deco" onchange="renderCard()"><option value="standard">Standard</option><option value="minimal">Minimal</option><option value="rich">Rich</option></select></div>
-              <div class="so-field"><label>Layout</label><select class="so-sel" id="bc-layout" onchange="renderCard()"><option value="balanced">Balanced</option><option value="name">Name forward</option><option value="company">Company forward</option></select></div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-right">
-          <div class="bc-prev-lbl">Style</div>
-          <div class="bc-styles">
-            <button class="sty-btn active" onclick="setStyle('minimal',this)">Minimal</button>
-            <button class="sty-btn" onclick="setStyle('bold',this)">Bold</button>
-            <button class="sty-btn" onclick="setStyle('split',this)">Split</button>
-            <button class="sty-btn" onclick="setStyle('signal',this)">Signal</button>
-          </div>
-          <div class="bc-prev-lbl">Preview</div>
-          <canvas id="bizcard" width="680" height="380"></canvas>
-          <div class="actions">
-            <button class="act-btn primary" onclick="dlCard()">PNG</button>
-            <button class="act-btn" onclick="dlCardPDF()">PDF</button>
-          </div>
-        </div>
+      <!-- Actions -->
+      <div class="flex gap-sm flex-wrap">
+        <button class="flex-1 min-w-[130px] py-3 border border-outline rounded-lg font-bold text-sm hover:bg-surface-container-low hover:border-primary-container/60 transition-colors" onclick="copyGuide()">Copy Guide</button>
+        <button class="flex-1 min-w-[130px] py-3 border border-outline rounded-lg font-bold text-sm hover:bg-surface-container-low hover:border-primary-container/60 transition-colors" onclick="dlTxt()">Download .txt</button>
+        <button id="pdfBtn" class="flex-1 min-w-[130px] py-3 bg-primary-container text-[#00050F] rounded-lg font-bold text-sm hover:brightness-110 transition-all disabled:opacity-40" onclick="dlPDF()">Download PDF</button>
       </div>
     </div>
+
+    <!-- TAB: BIZCARD -->
+    <div id="tab-bizcard" class="tab-panel hidden rise">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-lg items-start">
+        <div class="flex flex-col gap-md">
+          <div class="bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-md">// 01_CARD_DETAILS</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Full Name</span><input class="mfy-text" type="text" id="bc-name" placeholder="Jane Smith" oninput="renderCard()"></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Job Title</span><input class="mfy-text" type="text" id="bc-title" placeholder="Founder &amp; CEO" oninput="renderCard()"></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Email</span><input class="mfy-text" type="text" id="bc-email" placeholder="jane@company.com" oninput="renderCard()"></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Phone</span><input class="mfy-text" type="text" id="bc-phone" placeholder="+1 (555) 000-0000" oninput="renderCard()"></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Website</span><input class="mfy-text" type="text" id="bc-website" placeholder="company.com" oninput="renderCard()"></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant">Company</span><input class="mfy-text" type="text" id="bc-company" placeholder="Acme Inc." oninput="renderCard()"></label>
+            </div>
+          </div>
+          <div class="bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+            <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-md">// 02_CUSTOMIZATION</div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-sm">
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Color</span><select class="mfy" id="bc-color" onchange="renderCard()"><option value="">Brand colors</option><option value="mono-dark">Mono dark</option><option value="mono-light">Mono light</option><option value="accent">Accent only</option></select></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Decoration</span><select class="mfy" id="bc-deco" onchange="renderCard()"><option value="standard">Standard</option><option value="minimal">Minimal</option><option value="rich">Rich</option></select></label>
+              <label class="flex flex-col gap-1"><span class="font-label-caps text-[9px] uppercase tracking-widest text-on-surface-variant">Layout</span><select class="mfy" id="bc-layout" onchange="renderCard()"><option value="balanced">Balanced</option><option value="name">Name forward</option><option value="company">Company forward</option></select></label>
+            </div>
+          </div>
+        </div>
+        <div class="lg:sticky lg:top-28">
+          <div class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Style</div>
+          <div class="flex gap-2 mb-4 flex-wrap">
+            <button class="sty-btn pill !border-primary-container !text-[#00050F] !bg-primary-container font-bold" onclick="setStyle('minimal',this)">Minimal</button>
+            <button class="sty-btn pill" onclick="setStyle('bold',this)">Bold</button>
+            <button class="sty-btn pill" onclick="setStyle('split',this)">Split</button>
+            <button class="sty-btn pill" onclick="setStyle('signal',this)">Signal</button>
+          </div>
+          <div class="font-label-caps text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Preview</div>
+          <canvas id="bizcard" width="680" height="380" class="w-[340px] max-w-full rounded-lg block shadow-[0_12px_40px_rgba(0,5,15,.4)]"></canvas>
+          <div class="flex gap-sm mt-4">
+            <button class="flex-1 py-3 bg-primary-container text-[#00050F] rounded-lg font-bold text-sm hover:brightness-110 transition-all" onclick="dlCard()">PNG</button>
+            <button class="flex-1 py-3 border border-outline rounded-lg font-bold text-sm hover:bg-surface-container-low transition-colors" onclick="dlCardPDF()">PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats / Feature Ticker -->
+  <div class="max-w-7xl mx-auto mt-xl px-6 md:px-margin grid grid-cols-2 md:grid-cols-4 gap-lg pt-lg border-t border-outline/30">
+    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">0.4s</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Analysis speed</span></div>
+    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">99.8%</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Accuracy rating</span></div>
+    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">12k+</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Brands Scanned</span></div>
+    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">24/7</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Live Intelligence</span></div>
   </div>
 
-</div>
+  <!-- Architecture of Brand DNA -->
+  <section class="max-w-7xl mx-auto px-6 md:px-margin mt-xl py-xl">
+    <div class="flex flex-col mb-lg">
+      <span class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-2">// CAPABILITIES.MDF</span>
+      <h2 class="font-display-lg text-headline-lg font-semibold">The Architecture of Brand DNA</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+      <div class="p-lg bg-surface-container-low border border-outline rounded-xl bento-glow hover:border-primary-container/50 transition-colors">
+        <span class="material-symbols-outlined text-primary mb-md block">psychology</span>
+        <h3 class="text-lg font-semibold mb-sm">Deep Extraction</h3>
+        <p class="text-on-surface-variant text-body-md">Neural scanning of site hierarchy and semantic structure to define the core brand pillars.</p>
+      </div>
+      <div class="p-lg bg-surface-container-low border border-outline rounded-xl bento-glow hover:border-primary-container/50 transition-colors">
+        <span class="material-symbols-outlined text-primary mb-md block">contrast</span>
+        <h3 class="text-lg font-semibold mb-sm">Chromatic Analysis</h3>
+        <p class="text-on-surface-variant text-body-md">Algorithmic color mapping based on accessibility standards and psychological resonance.</p>
+      </div>
+      <div class="p-lg bg-surface-container-low border border-outline rounded-xl bento-glow hover:border-primary-container/50 transition-colors">
+        <span class="material-symbols-outlined text-primary mb-md block">polyline</span>
+        <h3 class="text-lg font-semibold mb-sm">Vector Synthesis</h3>
+        <p class="text-on-surface-variant text-body-md">Real-time SVG generation for logos and print-ready assets based on detected geometry.</p>
+      </div>
+    </div>
+  </section>
 
-<!-- ── PAGE: SYNC ── -->
-<div class="page" id="page-sync">
-<div class="sync-wrap">
-  <div class="sync-hero">
-    <div>
-      <div class="sync-eyebrow"><div class="sync-eye-dot"></div>Coming Soon</div>
-      <div class="sync-title">Marketfy<br><em>SYNC</em></div>
-      <p class="sync-desc">Keep your brand consistent everywhere — automatically. SYNC monitors your website, social channels, and marketing materials in real time, alerting you the moment something drifts.</p>
-      <div class="notify-card">
-        <input type="text" class="notify-input" id="notifyEmail" placeholder="your@email.com" />
-        <button class="notify-submit" onclick="notifyMe()">Notify me</button>
+  <!-- The Intelligence Loop -->
+  <section class="bg-surface-container-lowest/50 border-y border-outline/30 py-xl mt-xl">
+    <div class="max-w-7xl mx-auto px-6 md:px-margin">
+      <div class="flex flex-col items-center text-center mb-xl">
+        <span class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-2">// PIPELINE_EXECUTION</span>
+        <h2 class="font-display-lg text-headline-lg font-semibold">The Intelligence Loop</h2>
       </div>
-      <div class="notify-ok" id="notifyOk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> You're on the list.</div>
-    </div>
-    <div class="sync-visual">
-      <div class="sv-inner">
-        <div class="sv-bar b1"></div><div class="sv-thin"></div>
-        <div class="sv-bar b2"></div><div class="sv-thin" style="width:18%"></div>
-        <div class="sv-bar b3"></div><div class="sv-thin" style="width:42%"></div>
-        <div class="sv-bar b4"></div><div class="sv-thin" style="width:25%"></div>
-        <div class="sv-bar b5"></div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter relative">
+        <div class="hidden md:block absolute top-12 left-0 w-full h-[1px] bg-outline/20 -z-10"></div>
+        <div class="flex flex-col items-center text-center gap-sm">
+          <div class="w-12 h-12 rounded-full bg-background border border-primary-container flex items-center justify-center font-data-mono text-primary shadow-[0_0_15px_rgba(0,168,255,0.3)]">01</div>
+          <h4 class="font-bold">Scan</h4>
+          <p class="text-body-md text-on-surface-variant">Enter URL for deep-packet inspection.</p>
+        </div>
+        <div class="flex flex-col items-center text-center gap-sm">
+          <div class="w-12 h-12 rounded-full bg-background border border-outline flex items-center justify-center font-data-mono text-on-surface-variant">02</div>
+          <h4 class="font-bold">Decode</h4>
+          <p class="text-body-md text-on-surface-variant">AI identifies core strategic patterns.</p>
+        </div>
+        <div class="flex flex-col items-center text-center gap-sm">
+          <div class="w-12 h-12 rounded-full bg-background border border-outline flex items-center justify-center font-data-mono text-on-surface-variant">03</div>
+          <h4 class="font-bold">Design</h4>
+          <p class="text-body-md text-on-surface-variant">Systemic generation of visual assets.</p>
+        </div>
+        <div class="flex flex-col items-center text-center gap-sm">
+          <div class="w-12 h-12 rounded-full bg-background border border-outline flex items-center justify-center font-data-mono text-on-surface-variant">04</div>
+          <h4 class="font-bold">Ship</h4>
+          <p class="text-body-md text-on-surface-variant">Export PDF, TXT, and Vector files.</p>
+        </div>
       </div>
-      <div class="sv-label">Brand health</div>
     </div>
-  </div>
-  <div class="sync-feats">
-    <div class="sf"><div class="sf-num">01 / Monitoring</div><div class="sf-title">Live brand scanning</div><div class="sf-desc">Continuously scans your web presence for off-brand colors, fonts, and messaging drift.</div></div>
-    <div class="sf"><div class="sf-num">02 / Alerts</div><div class="sf-title">Instant notifications</div><div class="sf-desc">Get notified the moment something drifts from your brand guide — before customers notice.</div></div>
-    <div class="sf"><div class="sf-num">03 / Team</div><div class="sf-title">Shared guidelines</div><div class="sf-desc">Share your brand guide with your whole team and keep everyone aligned.</div></div>
-    <div class="sf"><div class="sf-num">04 / Insights</div><div class="sf-title">Brand health score</div><div class="sf-desc">A live score showing how consistent your brand is across all channels, updated daily.</div></div>
-    <div class="sf"><div class="sf-num">05 / Integrations</div><div class="sf-title">Plug-in ready</div><div class="sf-desc">Connects to Figma, Webflow, WordPress, Shopify, and your social channels seamlessly.</div></div>
-    <div class="sf"><div class="sf-num">06 / Auto-sync</div><div class="sf-title">Always current</div><div class="sf-desc">Your brand guide evolves as your brand does — SYNC keeps it current automatically.</div></div>
-  </div>
-</div>
-</div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="max-w-7xl mx-auto px-6 md:px-margin mt-xl py-xl">
+    <div class="flex flex-col items-center text-center mb-xl">
+      <span class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-2">// ACCESS_TIERS</span>
+      <h2 class="font-display-lg text-headline-lg font-semibold">Select Your Protocol</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-lg items-end">
+      <div class="p-lg bg-surface-container-low border border-outline rounded-xl flex flex-col gap-md">
+        <h3 class="font-data-mono text-on-surface-variant uppercase tracking-widest text-xs">Signal</h3>
+        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">Free</span></div>
+        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
+          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> 3 scans/mo</li>
+          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Basic swatches</li>
+        </ul>
+        <button class="w-full py-sm border border-outline rounded-lg font-bold hover:bg-surface-container-low transition-colors">Initialize</button>
+      </div>
+      <div class="p-lg bg-surface-container-low border border-primary-container rounded-xl flex flex-col gap-md relative shadow-[0_0_40px_rgba(0,168,255,0.15)] md:scale-105 z-10">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container text-background text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">Recommended</div>
+        <h3 class="font-data-mono text-primary uppercase tracking-widest text-xs">Core</h3>
+        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">$29</span><span class="text-on-surface-variant">/mo</span></div>
+        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
+          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Unlimited scans</li>
+          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Full brand guide</li>
+          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Business card generator</li>
+          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Priority support</li>
+        </ul>
+        <button class="w-full py-sm bg-primary-container text-background rounded-lg font-bold hover:brightness-110 transition-all">Authorize Access</button>
+      </div>
+      <div class="p-lg bg-surface-container-low border border-outline rounded-xl flex flex-col gap-md">
+        <h3 class="font-data-mono text-on-surface-variant uppercase tracking-widest text-xs">Enterprise</h3>
+        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">Custom</span></div>
+        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
+          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> API access</li>
+          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Competitor scanning</li>
+          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Team workspaces</li>
+        </ul>
+        <button class="w-full py-sm border border-outline rounded-lg font-bold hover:bg-surface-container-low transition-colors">Contact Ops</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-xl border-t border-outline-variant bg-surface-container-lowest">
+    <div class="max-w-7xl mx-auto px-6 md:px-margin py-lg flex flex-col md:flex-row justify-between items-center gap-lg">
+      <div class="flex items-center gap-sm">
+        <div class="w-6 h-6 rounded-sm bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center opacity-80">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3"><path d="M2 13 L2 4 L4.5 4 L8 9 L11.5 4 L14 4 L14 13 L12 13 L12 7.5 L9 12 L7 12 L4 7.5 L4 13 Z" fill="#F5F0E8"/></svg>
+        </div>
+        <span class="font-display-lg text-lg font-bold tracking-tighter text-on-surface-variant">marketfy</span>
+      </div>
+      <div class="flex gap-lg items-center text-on-surface-variant text-body-md">
+        <a class="hover:text-primary transition-colors" href="#">Terms</a>
+        <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+        <a class="hover:text-primary transition-colors" href="#">API</a>
+      </div>
+      <div class="flex items-center gap-xs px-sm py-1 bg-surface-container-low rounded-full border border-outline/20">
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span class="font-data-mono text-[10px] text-on-surface-variant uppercase tracking-wider">System Status: Online</span>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 md:px-margin pb-lg text-center">
+      <p class="font-data-mono text-[10px] text-outline uppercase tracking-widest">© 2026 Marketfy Intelligence Systems. Terminal v2.4.0-Stable</p>
+    </div>
+  </footer>
+</main>
+
+<style>
+/* Small reusable pill button used by JS-rendered controls */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1px solid #0F3258;background:transparent;color:#bec7d3;font-family:'Geist',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;text-transform:uppercase;letter-spacing:.06em}
+.pill:hover{border-color:#00a8ff;color:#95ccff;background:rgba(0,168,255,.05)}
+.pill.active-opts{border-color:#95ccff;color:#95ccff;background:rgba(149,204,255,.08)}
+</style>
 
 <script>
 let brand=null,siteData=null,cardStyle='minimal';
 const toneColors=['#00A8FF','#A8D8FF','#0055A8','#F5F0E8','#5a8fd1'];
 
-
-// ── PAGE NAV ──
-function showPage(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
-  window.scrollTo(0,0);
+// ── UI helpers ──
+function toggleOpts(){
+  const b=document.getElementById('optsBody'),i=document.getElementById('accordion-icon');
+  b.classList.toggle('hidden');
+  i.style.transform=b.classList.contains('hidden')?'rotate(0deg)':'rotate(180deg)';
 }
+function toggleSO(id,btn){document.getElementById(id).classList.toggle('hidden');btn.classList.toggle('active-opts');}
 function switchTab(id,btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(t=>{t.classList.remove('bg-secondary-container/40','text-primary');t.classList.add('text-on-surface-variant');});
+  btn.classList.add('bg-secondary-container/40','text-primary');btn.classList.remove('text-on-surface-variant');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('tab-'+id).classList.remove('hidden');
   if(id==='bizcard')renderCard();
 }
-function toggleOpts(){document.getElementById('optsBody').classList.toggle('open');document.getElementById('optsToggle').classList.toggle('open');}
-function toggleSO(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('active-opts');}
+function setLoading(on,msg){
+  const b=document.getElementById('genBtn');b.disabled=on;
+  b.innerHTML=on?'Analyzing...':'Analyze <span class="material-symbols-outlined text-base">arrow_forward</span>';
+  document.getElementById('progress').classList.toggle('hidden',!on);
+  if(msg)document.getElementById('progText').textContent=msg;
+}
+function setProgress(msg){document.getElementById('progText').textContent=msg;}
+function showErr(msg){const e=document.getElementById('errMsg');e.textContent=msg;e.classList.remove('hidden');}
 
+// ── Options ──
 function getGlobalOpts(){return{tone:document.getElementById('opt-tone')?.value||'',industry:document.getElementById('opt-industry')?.value||'',colorStyle:document.getElementById('opt-colorstyle')?.value||'',audience:document.getElementById('opt-audience')?.value||'',length:document.getElementById('opt-length')?.value||'standard',typePref:document.getElementById('opt-typepref')?.value||'',custom:document.getElementById('opt-custom')?.value||''};}
 function getSO(s){const m={colors:{mood:'so-colors-mood',count:'so-colors-count',custom:'so-colors-custom'},typography:{style:'so-typo-style',source:'so-typo-source',custom:'so-typo-custom'},voiceAndTone:{tone:'so-voice-tone',style:'so-voice-style',custom:'so-voice-custom'},keyMessages:{focus:'so-msgs-focus',cta:'so-msgs-cta',custom:'so-msgs-custom'},fullGuide:{length:'so-guide-length',emphasis:'so-guide-emphasis',custom:'so-guide-custom'}};const r={};Object.entries(m[s]||{}).forEach(([k,id])=>{r[k]=document.getElementById(id)?.value||'';});return r;}
 function buildSuffix(g,sec={}){const p=[];if(g.tone)p.push('Brand tone: '+g.tone);if(g.industry)p.push('Industry: '+g.industry);if(g.colorStyle)p.push('Color style: '+g.colorStyle);if(g.audience)p.push('Audience: '+g.audience);if(g.length&&g.length!=='standard')p.push('Length: '+g.length);if(g.typePref)p.push('Typography: '+g.typePref);if(g.custom)p.push('Additional: '+g.custom);Object.entries(sec).forEach(([k,v])=>{if(v)p.push(k+': '+v);});return p.length?'\n\nUSER PREFERENCES:\n'+p.map(x=>'- '+x).join('\n'):'';}
 
+// ── Analyze flow ──
 async function start(){
   let url=document.getElementById('urlInput').value.trim();
   if(!url){showErr('Please enter a URL.');return;}
   if(!url.startsWith('http'))url='https://'+url;
   try{new URL(url);}catch{showErr('Invalid URL.');return;}
   setLoading(true,'Crawling your website...');
-  document.getElementById('result').classList.remove('on');
-  document.getElementById('errMsg').classList.remove('on');
-  document.getElementById('scanInfo').classList.remove('on');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('errMsg').classList.add('hidden');
+  document.getElementById('scanInfo').classList.add('hidden');
   try{
     setProgress('Scanning pages, extracting design tokens...');
     const sr=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'scrape',url})});
@@ -686,8 +622,8 @@ async function start(){
     if(!sj.scraped)throw new Error('Scrape failed');
     siteData=sj.data;siteData.pagesScanned=sj.pagesScanned;
     const si=document.getElementById('scanInfo');
-    si.textContent=`${sj.pagesScanned} page${sj.pagesScanned!==1?'s':''} scanned · ${siteData.sortedColors?.length||0} colors · ${siteData.fonts?.length||0} fonts detected`;
-    si.classList.add('on');
+    document.getElementById('scanInfoText').textContent=`${sj.pagesScanned} page${sj.pagesScanned!==1?'s':''} scanned · ${siteData.sortedColors?.length||0} colors · ${siteData.fonts?.length||0} fonts detected`;
+    si.classList.remove('hidden');si.classList.add('flex');
     setProgress('Generating brand guide...');
     const optsSuffix=buildSuffix(getGlobalOpts());
     const gr=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',section:'full',siteData,url,optsSuffix})});
@@ -695,7 +631,7 @@ async function start(){
     if(!gr.ok||gj.error)throw new Error(gj.error||'Brand generation failed.');
     brand=gj.result;
     renderAll();setLoading(false);
-    document.getElementById('result').classList.add('on');
+    document.getElementById('result').classList.remove('hidden');
     if(!document.getElementById('bc-company').value)document.getElementById('bc-company').value=brand.brandName||'';
     setTimeout(()=>document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'}),100);
   }catch(err){setLoading(false);showErr('Error: '+err.message);console.error(err);}
@@ -712,12 +648,13 @@ async function regenSec(section,soId,btn){
     Object.assign(brand,json.result);
     renderSection(section);
     if(section==='colors')renderCard();
-    document.getElementById(soId)?.classList.remove('open');
+    document.getElementById(soId)?.classList.add('hidden');
     btn.classList.remove('active-opts');
   }catch(err){console.error(err);alert('Failed: '+err.message);}
   finally{btn.classList.remove('spinning');btn.disabled=false;}
 }
 
+// ── Render ──
 function renderAll(){
   if(!brand)return;
   document.getElementById('bName').textContent=brand.brandName||'';
@@ -725,10 +662,10 @@ function renderAll(){
   document.getElementById('bDesc').textContent=brand.description||'';
   document.getElementById('bsName').textContent=brand.brandName||'';
   document.getElementById('bsStats').innerHTML=`
-    <div class="bs-stat"><span>Colors</span><strong>${brand.colors?.length||0}</strong></div>
-    <div class="bs-stat"><span>Fonts</span><strong>${Object.keys(brand.typography||{}).length}</strong></div>
-    <div class="bs-stat"><span>Messages</span><strong>${brand.keyMessages?.length||0}</strong></div>
-    <div class="bs-stat"><span>Pages</span><strong>${siteData?.pagesScanned||0}</strong></div>`;
+    <span>Colors <b class="text-on-surface">${brand.colors?.length||0}</b></span>
+    <span>Fonts <b class="text-on-surface">${Object.keys(brand.typography||{}).length}</b></span>
+    <span>Messages <b class="text-on-surface">${brand.keyMessages?.length||0}</b></span>
+    <span>Pages <b class="text-on-surface">${siteData?.pagesScanned||0}</b></span>`;
   const bhMark=document.getElementById('bhMark');
   const c1=brand.colors?.[0]?.hex||'#00A8FF',c2=brand.colors?.[1]?.hex||'#0055A8';
   bhMark.style.background=`linear-gradient(135deg,${c1},${c2})`;
@@ -740,12 +677,14 @@ function renderSection(s){
   if(!brand)return;
   if(s==='colors'){
     document.getElementById('colorGrid').innerHTML=(brand.colors||[]).map(c=>`
-      <div class="cs" onclick="copyHex('${c.hex}',this)">
-        <div class="cs-fill" style="background:${c.hex}"><div class="cs-copy">Copy</div></div>
-        <div class="cs-info">
-          <div class="cs-hex">${c.hex}</div>
-          <div class="cs-name">${c.name}</div>
-          <div class="cs-role">${c.role}</div>
+      <div class="group bg-background border border-outline/50 rounded-lg overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 hover:border-primary-container hover:shadow-[0_12px_28px_rgba(0,168,255,.12)]" onclick="copyHex('${c.hex}',this)">
+        <div class="h-[74px] relative border-b border-outline/50" style="background:${c.hex}">
+          <div class="cs-copy absolute inset-0 hidden group-hover:flex items-center justify-center bg-[#00050F]/70 text-[11px] font-bold uppercase tracking-wider backdrop-blur-[2px]">Copy</div>
+        </div>
+        <div class="p-3">
+          <div class="font-data-mono text-[11px] font-medium mb-0.5">${c.hex}</div>
+          <div class="text-[11.5px] text-on-surface-variant font-medium">${c.name}</div>
+          <div class="text-[9.5px] text-outline uppercase tracking-wider font-semibold mt-0.5">${c.role}</div>
         </div>
       </div>`).join('');
   }
@@ -754,15 +693,18 @@ function renderSection(s){
     const sample={Display:brand.brandName||'Your Brand',Body:'The quick brown fox jumps over the lazy dog',Accent:'Quotable insight'};
     document.getElementById('fontList').innerHTML=[{role:'Display',f:t.displayFont},{role:'Body',f:t.bodyFont},{role:'Accent',f:t.accentFont}].filter(r=>r.f).map(r=>{
       const fontStack=`'${r.f.name}','Geist',sans-serif`;
-      return `<div class="font-item">
-        <div class="fi-meta"><div class="fi-role">${r.role}</div><div class="fi-name">${r.f.name||''}</div></div>
-        <div class="fi-sample" style="font-family:${fontStack};font-style:${r.role==='Accent'?'italic':'normal'}">${sample[r.role]||''}</div>
-        <div class="fi-usage">${r.f.usage||''}</div>
+      return `<div class="bg-background border border-outline/50 rounded-lg p-4 transition-colors hover:border-outline">
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-label-caps text-[9.5px] font-bold uppercase tracking-widest text-primary">${r.role}</div>
+          <div class="text-[11px] text-on-surface-variant font-medium">${r.f.name||''}</div>
+        </div>
+        <div class="text-[26px] leading-tight font-medium tracking-tight mb-1" style="font-family:${fontStack};font-style:${r.role==='Accent'?'italic':'normal'}">${sample[r.role]||''}</div>
+        <div class="text-[11.5px] text-outline italic">${r.f.usage||''}</div>
       </div>`;
     }).join('');
   }
   if(s==='voiceAndTone'){
-    document.getElementById('traits').innerHTML=(brand.voiceAndTone?.traits||[]).map((t,i)=>`<span class="trait" style="color:${toneColors[i%5]};border-color:${toneColors[i%5]}40;background:${toneColors[i%5]}0e">${t}</span>`).join('');
+    document.getElementById('traits').innerHTML=(brand.voiceAndTone?.traits||[]).map((t,i)=>`<span class="px-3 py-1.5 rounded-lg text-[12px] font-medium border" style="color:${toneColors[i%5]};border-color:${toneColors[i%5]}40;background:${toneColors[i%5]}0e">${t}</span>`).join('');
     document.getElementById('toneDesc').textContent=brand.voiceAndTone?.description||'';
   }
   if(s==='logo'||s==='logoConcept'){
@@ -774,16 +716,22 @@ function renderSection(s){
   }
   if(s==='keyMessages'){
     document.getElementById('msgs').innerHTML=(brand.keyMessages||[]).map((m,i)=>`
-      <div class="msg">
-        <div class="msg-num">${String(i+1).padStart(2,'0')}</div>
-        <div class="msg-type">${m.type||''}</div>
-        <div class="msg-text">${m.message||''}</div>
+      <div class="relative bg-background border border-outline/50 rounded-lg p-4 transition-all hover:border-primary-container hover:-translate-y-0.5">
+        <div class="absolute top-3.5 right-4 font-data-mono text-[11px] text-outline">${String(i+1).padStart(2,'0')}</div>
+        <div class="font-label-caps text-[9.5px] uppercase tracking-widest text-primary font-bold mb-2">${m.type||''}</div>
+        <div class="text-body-md leading-relaxed">${m.message||''}</div>
       </div>`).join('');
   }
   if(s==='fullGuide'){document.getElementById('guideText').textContent=brand.fullGuide||'';}
 }
 
-function setStyle(s,btn){cardStyle=s;document.querySelectorAll('.sty-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCard();}
+// ── Business card canvas ──
+function setStyle(s,btn){
+  cardStyle=s;
+  document.querySelectorAll('.sty-btn').forEach(b=>{b.classList.remove('!border-primary-container','!text-[#00050F]','!bg-primary-container','font-bold');});
+  btn.classList.add('!border-primary-container','!text-[#00050F]','!bg-primary-container','font-bold');
+  renderCard();
+}
 
 function renderCard(){
   const canvas=document.getElementById('bizcard');const ctx=canvas.getContext('2d');const W=680,H=380;ctx.clearRect(0,0,W,H);
@@ -850,6 +798,7 @@ function renderCard(){
 
 function hexToRgb(hex){hex=hex.replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');const n=parseInt(hex,16);return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};}
 
+// ── PDF export ──
 async function dlPDF(){
   if(!brand)return;
   const btn=document.getElementById('pdfBtn');btn.disabled=true;btn.textContent='Building...';
@@ -919,14 +868,10 @@ async function dlPDF(){
 function dlCard(){renderCard();const c=document.getElementById('bizcard'),a=document.createElement('a');a.download=`${brand?.brandName||'business'}-card.png`;a.href=c.toDataURL('image/png');a.click();}
 function dlCardPDF(){renderCard();const c=document.getElementById('bizcard'),{jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:[88.9,50.8],orientation:'landscape'});doc.addImage(c.toDataURL('image/png'),'PNG',0,0,88.9,50.8);doc.save(`${brand?.brandName||'business'}-card.pdf`);}
 
-function setLoading(on,msg){const b=document.getElementById('genBtn');b.disabled=on;b.innerHTML=on?'Analyzing...':'Analyze <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';document.getElementById('progress').classList.toggle('on',on);if(msg)document.getElementById('progText').textContent=msg;}
-function setProgress(msg){document.getElementById('progText').textContent=msg;}
-function showErr(msg){const e=document.getElementById('errMsg');e.textContent=msg;e.classList.add('on');}
-function copyHex(hex,el){navigator.clipboard.writeText(hex).then(()=>{el.classList.add('flashed');setTimeout(()=>el.classList.remove('flashed'),900);});}
+function copyHex(hex,el){navigator.clipboard.writeText(hex).then(()=>{const o=el.querySelector('.cs-copy');if(o){o.textContent='Copied';o.classList.remove('hidden');o.classList.add('flex');setTimeout(()=>{o.textContent='Copy';o.classList.add('hidden');o.classList.remove('flex');},900);}});}
 function copyGuide(){if(!brand)return;navigator.clipboard.writeText(fmtTxt()).then(()=>alert('Copied!'));}
 function dlTxt(){if(!brand)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([fmtTxt()],{type:'text/plain'}));a.download=`${brand.brandName||'brand'}-guide.txt`;a.click();}
 function fmtTxt(){const b=brand;return `BRAND GUIDE: ${b.brandName}\n${'='.repeat(50)}\nTAGLINE: ${b.tagline}\n\nDESCRIPTION:\n${b.description}\n\nCOLOR PALETTE:\n${(b.colors||[]).map(c=>`  ${c.role}: ${c.name} (${c.hex})`).join('\n')}\n\nTYPOGRAPHY:\n  Display: ${b.typography?.displayFont?.name}\n  Body: ${b.typography?.bodyFont?.name}\n  Accent: ${b.typography?.accentFont?.name}\n\nVOICE & TONE:\n  ${(b.voiceAndTone?.traits||[]).join(', ')}\n  ${b.voiceAndTone?.description}\n\nLOGO CONCEPT:\n${b.logoConcept}\n\nKEY MESSAGES:\n${(b.keyMessages||[]).map(m=>`  [${m.type}] ${m.message}`).join('\n')}\n\n${'='.repeat(50)}\n${b.fullGuide}\n\n---\nGenerated by Marketfy`;}
-function notifyMe(){const e=document.getElementById('notifyEmail');if(!e.value.trim())return;document.getElementById('notifyOk').classList.add('on');e.value='';}
 
 document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
 </script>
