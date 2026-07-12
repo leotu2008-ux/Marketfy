@@ -9,7 +9,8 @@ exports.handler = async function (event) {
 
   try {
     const body = JSON.parse(event.body);
-    const { statusCode, body: resBody } = await handleRequest(body);
+    const ip = (event.headers["x-forwarded-for"] || event.headers["client-ip"] || "").split(",")[0].trim() || "unknown";
+    const { statusCode, body: resBody } = await handleRequest(body, ip);
     return { statusCode, headers, body: JSON.stringify(resBody) };
   } catch (err) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };

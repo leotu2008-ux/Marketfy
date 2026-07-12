@@ -10,7 +10,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const { statusCode, body: resBody } = await handleRequest(body || {});
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
+    const { statusCode, body: resBody } = await handleRequest(body || {}, ip);
     res.status(statusCode).json(resBody);
   } catch (err) {
     res.status(500).json({ error: err.message });

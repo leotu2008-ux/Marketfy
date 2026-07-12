@@ -587,6 +587,10 @@ async function start(){
     const gj=await gr.json();
     if(!gr.ok||gj.error)throw new Error(gj.error||'Brand generation failed.');
     brand=gj.result;
+    if(typeof gj.remaining==='number'){
+      const t=document.getElementById('scanInfoText');
+      t.textContent+=` · ${gj.remaining} scan${gj.remaining!==1?'s':''} left today`;
+    }
     renderAll();setLoading(false);
     document.getElementById('result').classList.remove('hidden');
     if(!document.getElementById('bc-company').value)document.getElementById('bc-company').value=brand.brandName||'';
