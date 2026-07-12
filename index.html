@@ -499,44 +499,16 @@ select.mfy option{background:#021428}
     </div>
   </section>
 
-  <!-- Pricing -->
+  <!-- Free access banner -->
   <section class="max-w-7xl mx-auto px-6 md:px-margin mt-xl py-xl">
-    <div class="flex flex-col items-center text-center mb-xl">
-      <span class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-2">// ACCESS_TIERS</span>
-      <h2 class="font-display-lg text-headline-lg font-semibold">Select Your Protocol</h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-lg items-end">
-      <div class="p-lg bg-surface-container-low border border-outline rounded-xl flex flex-col gap-md">
-        <h3 class="font-data-mono text-on-surface-variant uppercase tracking-widest text-xs">Signal</h3>
-        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">Free</span></div>
-        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
-          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> 3 scans/mo</li>
-          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Basic swatches</li>
-        </ul>
-        <button class="w-full py-sm border border-outline rounded-lg font-bold hover:bg-surface-container-low transition-colors">Initialize</button>
-      </div>
-      <div class="p-lg bg-surface-container-low border border-primary-container rounded-xl flex flex-col gap-md relative shadow-[0_0_40px_rgba(0,168,255,0.15)] md:scale-105 z-10">
-        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container text-background text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">Recommended</div>
-        <h3 class="font-data-mono text-primary uppercase tracking-widest text-xs">Core</h3>
-        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">$29</span><span class="text-on-surface-variant">/mo</span></div>
-        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
-          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Unlimited scans</li>
-          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Full brand guide</li>
-          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Business card generator</li>
-          <li class="flex items-center gap-sm text-body-md"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Priority support</li>
-        </ul>
-        <button class="w-full py-sm bg-primary-container text-background rounded-lg font-bold hover:brightness-110 transition-all">Authorize Access</button>
-      </div>
-      <div class="p-lg bg-surface-container-low border border-outline rounded-xl flex flex-col gap-md">
-        <h3 class="font-data-mono text-on-surface-variant uppercase tracking-widest text-xs">Enterprise</h3>
-        <div class="flex items-baseline gap-1"><span class="text-headline-lg font-bold">Custom</span></div>
-        <ul class="flex flex-col gap-sm border-t border-outline/30 pt-md">
-          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> API access</li>
-          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Competitor scanning</li>
-          <li class="flex items-center gap-sm text-body-md text-on-surface-variant"><span class="material-symbols-outlined text-primary text-sm">check_circle</span> Team workspaces</li>
-        </ul>
-        <button class="w-full py-sm border border-outline rounded-lg font-bold hover:bg-surface-container-low transition-colors">Contact Ops</button>
-      </div>
+    <div class="relative overflow-hidden bg-surface-container-low border border-primary-container/50 rounded-xl p-10 md:p-14 text-center bento-glow shadow-[0_0_40px_rgba(0,168,255,0.1)]">
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 glow-cyan blur-[80px] pointer-events-none"></div>
+      <span class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-3 block">// OPEN_ACCESS</span>
+      <h2 class="font-display-lg text-headline-lg font-semibold mb-3">Free. For everyone. Forever.</h2>
+      <p class="text-on-surface-variant text-body-lg max-w-xl mx-auto mb-8">Unlimited scans, full brand guides, and the business card generator — no account, no credit card, no tiers.</p>
+      <button class="px-8 py-3 bg-primary-container text-[#00050F] rounded-full font-bold hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-xs" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>document.getElementById('urlInput').focus(),600)">
+        Start scanning <span class="material-symbols-outlined text-base">arrow_upward</span>
+      </button>
     </div>
   </section>
 
