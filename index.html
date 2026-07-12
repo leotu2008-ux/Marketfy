@@ -336,9 +336,9 @@ select.mfy option{background:#021428}
         </div>
       </div>
 
-      <!-- Row: voice + logo -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-md mb-md">
-        <div class="md:col-span-2 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
+      <!-- Voice & tone -->
+      <div class="mb-md">
+        <div class="bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
           <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
             <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 03_VOICE_TONE</div>
             <div class="flex gap-2">
@@ -356,21 +356,12 @@ select.mfy option{background:#021428}
           <div id="traits" class="flex flex-wrap gap-2 mb-sm"></div>
           <div id="toneDesc" class="text-body-md text-on-surface-variant italic leading-relaxed border-l-2 border-primary-container pl-4"></div>
         </div>
-
-        <div class="md:col-span-3 bg-surface-container-low border border-outline rounded-xl p-md bento-glow">
-          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em] mb-md">// 04_LOGO_CONCEPT</div>
-          <div id="logoConcept" class="text-body-md text-on-surface-variant leading-relaxed mb-sm"></div>
-          <div class="relative overflow-hidden bg-background border border-outline rounded-lg min-h-[140px] flex items-center justify-center p-8">
-            <div class="absolute inset-0 glow-cyan opacity-40 pointer-events-none"></div>
-            <div id="logoPrev" class="relative text-3xl font-bold tracking-tight"></div>
-          </div>
-        </div>
       </div>
 
       <!-- Key messages -->
       <div class="bg-surface-container-low border border-outline rounded-xl p-md mb-md bento-glow">
         <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
-          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 05_KEY_MESSAGES</div>
+          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 04_KEY_MESSAGES</div>
           <div class="flex gap-2">
             <button class="pill" onclick="toggleSO('so-msgs',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
             <button class="pill" onclick="regenSec('keyMessages','so-msgs',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
@@ -389,7 +380,7 @@ select.mfy option{background:#021428}
       <!-- Full guide -->
       <div class="bg-surface-container-low border border-outline rounded-xl p-md mb-md bento-glow">
         <div class="flex items-center justify-between flex-wrap gap-2 mb-md">
-          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 06_FULL_BRAND_GUIDE</div>
+          <div class="font-data-mono text-primary text-[12px] uppercase tracking-[0.2em]">// 05_FULL_BRAND_GUIDE</div>
           <div class="flex gap-2">
             <button class="pill" onclick="toggleSO('so-guide',this)"><span class="material-symbols-outlined text-sm">tune</span>Options</button>
             <button class="pill" onclick="regenSec('fullGuide','so-guide',this)"><span class="material-symbols-outlined text-sm">refresh</span>Regenerate</button>
@@ -631,7 +622,7 @@ function renderAll(){
   const c1=brand.colors?.[0]?.hex||'#00A8FF',c2=brand.colors?.[1]?.hex||'#0055A8';
   bhMark.style.background=`linear-gradient(135deg,${c1},${c2})`;
   document.getElementById('bhMarkText').textContent=(brand.brandName||'M').charAt(0).toUpperCase();
-  ['colors','typography','voiceAndTone','logo','keyMessages','fullGuide'].forEach(renderSection);
+  ['colors','typography','voiceAndTone','keyMessages','fullGuide'].forEach(renderSection);
 }
 
 function renderSection(s){
@@ -667,13 +658,6 @@ function renderSection(s){
   if(s==='voiceAndTone'){
     document.getElementById('traits').innerHTML=(brand.voiceAndTone?.traits||[]).map((t,i)=>`<span class="px-3 py-1.5 rounded-lg text-[12px] font-medium border" style="color:${toneColors[i%5]};border-color:${toneColors[i%5]}40;background:${toneColors[i%5]}0e">${t}</span>`).join('');
     document.getElementById('toneDesc').textContent=brand.voiceAndTone?.description||'';
-  }
-  if(s==='logo'||s==='logoConcept'){
-    document.getElementById('logoConcept').textContent=brand.logoConcept||'';
-    const lp=document.getElementById('logoPrev');
-    lp.style.background=`linear-gradient(135deg,${brand.colors?.[0]?.hex||'#00A8FF'},${brand.colors?.[1]?.hex||'#0055A8'})`;
-    lp.style.webkitBackgroundClip='text';lp.style.webkitTextFillColor='transparent';lp.style.backgroundClip='text';
-    lp.textContent=brand.logoText||brand.brandName||'';
   }
   if(s==='keyMessages'){
     document.getElementById('msgs').innerHTML=(brand.keyMessages||[]).map((m,i)=>`
@@ -800,10 +784,6 @@ async function dlPDF(){
       doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(pr,pg,pb);doc.text(t.role.toUpperCase(),M+6,y+4);
       doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(245,240,232);doc.text(t.f.name||'',M+32,y+4);
       doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(140,150,170);doc.text(t.f.usage||'',M+32,y+10);y+=22;});
-    y+=6;y=sh('LOGO CONCEPT',y);
-    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(196,194,187);doc.splitTextToSize(brand.logoConcept||'',CW).forEach(l=>{doc.text(l,M,y);y+=6;});y+=6;
-    doc.setFillColor(0,5,15);doc.roundedRect(M,y,CW,26,3,3,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.setTextColor(pr,pg,pb);doc.text(brand.logoText||brand.brandName||'',W/2,y+17,{align:'center'});y+=36;
     np(3);y=22;y=sh('VOICE & TONE',y);
     let tx=M;(brand.voiceAndTone?.traits||[]).forEach((trait,i)=>{const{r:tr,g:tg,b:tb}=hexToRgb(toneColors[i%5]);const tw=doc.getTextWidth(trait)+8;doc.setFillColor(tr,tg,tb);doc.setGState(new doc.GState({opacity:.18}));doc.roundedRect(tx,y-3,tw,9,1,1,'F');doc.setGState(new doc.GState({opacity:1}));doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(tr,tg,tb);doc.text(trait,tx+4,y+3);tx+=tw+5;if(tx>W-M-25){tx=M;y+=13;}});y+=14;
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(196,194,187);doc.splitTextToSize(brand.voiceAndTone?.description||'',CW).forEach(l=>{doc.text(l,M,y);y+=6;});y+=12;
@@ -832,7 +812,7 @@ function dlCardPDF(){renderCard();const c=document.getElementById('bizcard'),{js
 function copyHex(hex,el){navigator.clipboard.writeText(hex).then(()=>{const o=el.querySelector('.cs-copy');if(o){o.textContent='Copied';o.classList.remove('hidden');o.classList.add('flex');setTimeout(()=>{o.textContent='Copy';o.classList.add('hidden');o.classList.remove('flex');},900);}});}
 function copyGuide(){if(!brand)return;navigator.clipboard.writeText(fmtTxt()).then(()=>alert('Copied!'));}
 function dlTxt(){if(!brand)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([fmtTxt()],{type:'text/plain'}));a.download=`${brand.brandName||'brand'}-guide.txt`;a.click();}
-function fmtTxt(){const b=brand;return `BRAND GUIDE: ${b.brandName}\n${'='.repeat(50)}\nTAGLINE: ${b.tagline}\n\nDESCRIPTION:\n${b.description}\n\nCOLOR PALETTE:\n${(b.colors||[]).map(c=>`  ${c.role}: ${c.name} (${c.hex})`).join('\n')}\n\nTYPOGRAPHY:\n  Display: ${b.typography?.displayFont?.name}\n  Body: ${b.typography?.bodyFont?.name}\n  Accent: ${b.typography?.accentFont?.name}\n\nVOICE & TONE:\n  ${(b.voiceAndTone?.traits||[]).join(', ')}\n  ${b.voiceAndTone?.description}\n\nLOGO CONCEPT:\n${b.logoConcept}\n\nKEY MESSAGES:\n${(b.keyMessages||[]).map(m=>`  [${m.type}] ${m.message}`).join('\n')}\n\n${'='.repeat(50)}\n${b.fullGuide}\n\n---\nGenerated by Marketfy`;}
+function fmtTxt(){const b=brand;return `BRAND GUIDE: ${b.brandName}\n${'='.repeat(50)}\nTAGLINE: ${b.tagline}\n\nDESCRIPTION:\n${b.description}\n\nCOLOR PALETTE:\n${(b.colors||[]).map(c=>`  ${c.role}: ${c.name} (${c.hex})`).join('\n')}\n\nTYPOGRAPHY:\n  Display: ${b.typography?.displayFont?.name}\n  Body: ${b.typography?.bodyFont?.name}\n  Accent: ${b.typography?.accentFont?.name}\n\nVOICE & TONE:\n  ${(b.voiceAndTone?.traits||[]).join(', ')}\n  ${b.voiceAndTone?.description}\n\nKEY MESSAGES:\n${(b.keyMessages||[]).map(m=>`  [${m.type}] ${m.message}`).join('\n')}\n\n${'='.repeat(50)}\n${b.fullGuide}\n\n---\nGenerated by Marketfy`;}
 
 document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
 
