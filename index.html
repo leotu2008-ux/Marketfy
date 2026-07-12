@@ -72,6 +72,33 @@ body{background-color:#00050F;color:#e7e2da;overflow-x:hidden;font-family:'Geist
 .spinning .material-symbols-outlined{animation:spin 1s linear infinite}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .rise{animation:rise .4s ease both}
+
+/* Cold Signal Animations */
+@keyframes terminal-flicker{
+  0%,100%{opacity:1;filter:brightness(1)}
+  10%{opacity:.9;filter:brightness(1.2)}
+  20%{opacity:1;filter:brightness(1)}
+  70%{opacity:1;filter:brightness(1)}
+  71%{opacity:.7;filter:brightness(.8)}
+  72%{opacity:1;filter:brightness(1)}
+}
+@keyframes scan-reveal{0%{clip-path:inset(0 0 100% 0);opacity:0}100%{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes data-drift{0%{transform:translate(0,0)}50%{transform:translate(4px,-6px)}100%{transform:translate(0,0)}}
+@keyframes glitch-text{
+  0%{transform:translate(0);text-shadow:0 0 0 transparent}
+  2%{transform:translate(-2px,1px);text-shadow:2px 0 #00a8ff,-2px 0 #ffb4ab}
+  4%{transform:translate(2px,-1px);text-shadow:-2px 0 #00a8ff,2px 0 #ffb4ab}
+  6%{transform:translate(0);text-shadow:0 0 0 transparent}
+  100%{transform:translate(0);text-shadow:0 0 0 transparent}
+}
+@keyframes sweep{0%{left:-100%}50%{left:100%}100%{left:100%}}
+.animate-terminal-flicker{animation:terminal-flicker .4s infinite alternate}
+.animate-scan-reveal{animation:scan-reveal 1.5s cubic-bezier(.4,0,.2,1) forwards}
+.animate-glitch{animation:glitch-text 4s infinite linear}
+.animate-data-drift{animation:data-drift 6s ease-in-out infinite}
+.animate-fade-up{opacity:0;transform:translateY(20px);animation:fade-up-anim .8s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fade-up-anim{to{opacity:1;transform:translateY(0)}}
+.btn-scan-hover:hover .sweep-effect{animation:sweep 1.5s infinite}
 select.mfy,textarea.mfy,input.mfy-text{background:#00050F;border:1px solid #0F3258;border-radius:.5rem;padding:9px 12px;color:#e7e2da;font-size:13px;font-family:'Geist',sans-serif;outline:none;transition:border-color .2s;width:100%}
 select.mfy:focus,textarea.mfy:focus,input.mfy-text:focus{border-color:#00a8ff}
 select.mfy option{background:#021428}
@@ -109,26 +136,27 @@ select.mfy option{background:#021428}
   <section class="max-w-7xl mx-auto px-6 md:px-margin grid grid-cols-1 lg:grid-cols-12 gap-xl items-center">
     <!-- Left Column: Content & Inputs -->
     <div class="lg:col-span-6 flex flex-col gap-lg">
-      <div class="inline-flex items-center gap-xs px-sm py-xs bg-primary/10 border border-primary/20 rounded-full w-fit">
+      <div class="inline-flex items-center gap-xs px-sm py-xs bg-primary/10 border border-primary/20 rounded-full w-fit animate-terminal-flicker" style="animation-delay:200ms">
         <div class="w-2 h-2 rounded-full bg-primary pulse-signal"></div>
         <span class="font-label-caps text-label-caps uppercase tracking-widest text-primary">Brand Intelligence</span>
       </div>
       <div class="flex flex-col">
-        <h1 class="font-display-lg text-[48px] lg:text-[68px] leading-none mb-4 font-bold tracking-tighter">
+        <h1 class="font-display-lg text-[48px] lg:text-[68px] leading-none mb-4 font-bold tracking-tighter animate-glitch">
           Build your brand,<br/>
           <span class="text-gradient-cyan">decoded.</span>
         </h1>
-        <p class="font-body-lg text-on-surface-variant max-w-lg">
+        <p class="font-body-lg text-on-surface-variant max-w-lg animate-fade-up" style="animation-delay:400ms">
           Operate with clinical precision. Marketfy analyzes your digital footprint to extract core DNA, color systems, and strategic positioning in real-time.
         </p>
       </div>
 
       <!-- Input Card -->
-      <div class="p-md bg-surface-container-low border border-outline rounded-xl flex flex-col gap-sm shadow-2xl">
+      <div class="p-md bg-surface-container-low border border-outline rounded-xl flex flex-col gap-sm shadow-2xl animate-fade-up" style="animation-delay:500ms">
         <div class="relative group">
           <input id="urlInput" class="w-full bg-[#00050F] border border-outline rounded-full pl-6 pr-36 py-4 text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-outline text-[15px]" placeholder="Enter your brand URL (e.g. marketfy.ai)" type="text"/>
-          <button id="genBtn" onclick="start()" class="absolute right-2 top-1/2 -translate-y-1/2 h-11 px-5 bg-primary-container text-[#00050F] rounded-full font-bold hover:brightness-110 active:scale-95 transition-all flex items-center gap-xs disabled:opacity-40 disabled:cursor-not-allowed text-sm">
-            Analyze <span class="material-symbols-outlined text-base">arrow_forward</span>
+          <button id="genBtn" onclick="start()" class="btn-scan-hover absolute right-2 top-1/2 -translate-y-1/2 h-11 px-5 bg-primary-container text-[#00050F] rounded-full font-bold hover:brightness-110 active:scale-95 transition-all flex items-center gap-xs disabled:opacity-40 disabled:cursor-not-allowed text-sm overflow-hidden">
+            <span class="btn-label relative z-10 flex items-center gap-xs">Analyze <span class="material-symbols-outlined text-base">arrow_forward</span></span>
+            <span class="sweep-effect absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -left-full w-full skew-x-12"></span>
           </button>
         </div>
 
@@ -191,7 +219,7 @@ select.mfy option{background:#021428}
 
     <!-- Right Column: Visualizer -->
     <div class="lg:col-span-6 relative" id="visualizer">
-      <div class="relative w-full aspect-[4/3] bg-surface-container-low border border-outline rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,168,255,0.1)] hover:scale-[1.01] transition-transform duration-500">
+      <div class="relative w-full aspect-[4/3] bg-surface-container-low border border-outline rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,168,255,0.1)] hover:scale-[1.01] transition-transform duration-500 animate-scan-reveal">
         <div class="flex items-center gap-xs px-md py-sm border-b border-outline bg-background/50">
           <div class="flex gap-1.5">
             <div class="w-2.5 h-2.5 rounded-full bg-error/40"></div>
@@ -221,15 +249,15 @@ select.mfy option{background:#021428}
           </div>
         </div>
       </div>
-      <div class="hidden lg:flex absolute top-10 -right-4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container shadow-lg animate-bounce [animation-duration:3s]">
+      <div class="hidden lg:flex absolute top-10 -right-4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container shadow-lg animate-data-drift">
         <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">palette</span>
         <span class="font-label-caps text-label-caps uppercase text-on-surface">Color extracted</span>
       </div>
-      <div class="hidden lg:flex absolute bottom-20 -left-8 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/50 shadow-lg animate-pulse">
+      <div class="hidden lg:flex absolute bottom-20 -left-8 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/50 shadow-lg animate-data-drift" style="animation-delay:-2s">
         <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1;">text_fields</span>
         <span class="font-label-caps text-label-caps uppercase text-on-surface">Font detected</span>
       </div>
-      <div class="hidden lg:flex absolute -bottom-4 right-1/4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/30 shadow-lg">
+      <div class="hidden lg:flex absolute -bottom-4 right-1/4 items-center gap-xs bg-surface-container-low p-sm rounded-lg border border-primary-container/30 shadow-lg animate-data-drift" style="animation-delay:-4s">
         <span class="material-symbols-outlined text-primary">radar</span>
         <span class="font-label-caps text-label-caps uppercase text-on-surface">DNA Sequence Verified</span>
       </div>
@@ -430,8 +458,8 @@ select.mfy option{background:#021428}
 
   <!-- Stats / Feature Ticker -->
   <div class="max-w-7xl mx-auto mt-xl px-6 md:px-margin grid grid-cols-2 gap-lg pt-lg border-t border-outline/30">
-    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">3k+</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Brands Scanned</span></div>
-    <div class="flex flex-col gap-xs"><span class="font-display-lg text-headline-lg text-primary font-semibold">24/7</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Live Intelligence</span></div>
+    <div class="flex flex-col gap-xs animate-fade-up" style="animation-delay:600ms"><span class="font-display-lg text-headline-lg text-primary font-semibold">3k+</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Brands Scanned</span></div>
+    <div class="flex flex-col gap-xs animate-fade-up" style="animation-delay:700ms"><span class="font-display-lg text-headline-lg text-primary font-semibold">24/7</span><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Live Intelligence</span></div>
   </div>
 
   <!-- Architecture of Brand DNA -->
@@ -521,7 +549,7 @@ function switchTab(id,btn){
 }
 function setLoading(on,msg){
   const b=document.getElementById('genBtn');b.disabled=on;
-  b.innerHTML=on?'Analyzing...':'Analyze <span class="material-symbols-outlined text-base">arrow_forward</span>';
+  b.querySelector('.btn-label').innerHTML=on?'Analyzing...':'Analyze <span class="material-symbols-outlined text-base">arrow_forward</span>';
   document.getElementById('progress').classList.toggle('hidden',!on);
   if(msg)document.getElementById('progText').textContent=msg;
 }
@@ -803,6 +831,14 @@ function dlTxt(){if(!brand)return;const a=document.createElement('a');a.href=URL
 function fmtTxt(){const b=brand;return `BRAND GUIDE: ${b.brandName}\n${'='.repeat(50)}\nTAGLINE: ${b.tagline}\n\nDESCRIPTION:\n${b.description}\n\nCOLOR PALETTE:\n${(b.colors||[]).map(c=>`  ${c.role}: ${c.name} (${c.hex})`).join('\n')}\n\nTYPOGRAPHY:\n  Display: ${b.typography?.displayFont?.name}\n  Body: ${b.typography?.bodyFont?.name}\n  Accent: ${b.typography?.accentFont?.name}\n\nVOICE & TONE:\n  ${(b.voiceAndTone?.traits||[]).join(', ')}\n  ${b.voiceAndTone?.description}\n\nLOGO CONCEPT:\n${b.logoConcept}\n\nKEY MESSAGES:\n${(b.keyMessages||[]).map(m=>`  [${m.type}] ${m.message}`).join('\n')}\n\n${'='.repeat(50)}\n${b.fullGuide}\n\n---\nGenerated by Marketfy`;}
 
 document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
+
+// Subtle parallax on the browser mock
+const mock=document.getElementById('visualizer');
+document.addEventListener('mousemove',(e)=>{
+  const x=(window.innerWidth/2-e.pageX)/80;
+  const y=(window.innerHeight/2-e.pageY)/80;
+  if(mock)mock.style.transform=`perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+});
 </script>
 </body>
 </html>
